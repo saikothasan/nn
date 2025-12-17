@@ -1,56 +1,83 @@
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "bb",
-	"main": ".open-next/worker.js",
-	"compatibility_date": "2025-12-01",
-	"compatibility_flags": [
-		"nodejs_compat",
-		"global_fetch_strictly_public"
-	],
-	"assets": {
-		"binding": "ASSETS",
-		"directory": ".open-next/assets"
-	},
-	"images": {
-		// Enable image optimization
-		// see https://opennext.js.org/cloudflare/howtos/image
-		"binding": "IMAGES"
-	},
-	"services": [
-		{
-			// Self-reference service binding, the service name must match the worker name
-			// see https://opennext.js.org/cloudflare/caching
-			"binding": "WORKER_SELF_REFERENCE",
-			"service": "bb"
-		}
-	],
-	"observability": {
-		"enabled": true
-	}
-	/**
-	 * Smart Placement
-	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
-	 */
-	// "placement": {  "mode": "smart" }
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
-	/**
-	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
-	// "vars": {  "MY_VARIABLE": "production_value" }
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bb",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-12-01",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+
+  // 1. ASSETS & OBSERVABILITY
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  },
+  "observability": {
+    "enabled": true
+  },
+  // "Smart Placement" automatically moves your worker code closer to your D1 Database/R2
+  // This drastically reduces latency for database-heavy tools (like Bin Lookup).
+  "placement": { 
+    "mode": "smart" 
+  },
+
+  // 2. STORAGE BINDINGS
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bin-db",
+      "database_id": "be1a4fee-8588-44af-b67e-16e61ce4ff0c" 
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "0e4ed3d2aea64f5d8badda1e6b9172ca"
+    }
+  ],
+  "r2_buckets": [
+    {
+      // CRITICAL: This exact binding name enables the R2 Cache in open-next.config.ts
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "omni-agent-artifacts"
+    },
+    {
+      "binding": "MY_FILES",
+      "bucket_name": "omni-agent-artifacts"
+    }
+  ],
+
+  // 3. AI & BROWSER BINDINGS
+  // Allows you to build tools like "AI Text Generator" or "Website Screenshot"
+  "ai": {
+    "binding": "AI"
+  },
+  "browser": {
+    "binding": "MY_BROWSER"
+  },
+
+  // 4. MEDIA
+  "images": {
+    "binding": "IMAGES"
+  },
+
+  // 5. SECURITY & RATE LIMITING
+  // Essential for "Professional" tools to prevent API abuse
+  "ratelimits": [
+    {
+      "binding": "RATE_LIMITER",
+      "namespace_id": "1001", 
+      "limit": 50,     // 50 Requests
+      "period": 10     // Per 10 Seconds
+    }
+  ],
+
+  // 6. INTERNAL SERVICES
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "bb"
+    }
+  ]
 }
