@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     const userMessage = `URL: ${url}\n\nWebsite Content:\n${pageText}`;
 
-    const aiResponse = await env.AI.run(
+    const aiResponse: unknown = await env.AI.run(
       "@cf/meta/llama-3.1-8b-instruct",
       {
         messages: [
@@ -66,11 +66,22 @@ export async function POST(req: NextRequest) {
         },
       }
     );
+    
+    // SAFE TYPE CHECKING
+    let analysisText = "No analysis generated.";
+    if (
+      typeof aiResponse === 'object' && 
+      aiResponse !== null && 
+      'response' in aiResponse && 
+      typeof (aiResponse as { response: string }).response === 'string'
+    ) {
+      analysisText = (aiResponse as { response: string }).response;
+    }
 
     return NextResponse.json({
       success: true,
       screenshot: `${R2_CUSTOM_DOMAIN}/${filename}`,
-      analysis: (aiResponse as any).response || "No analysis generated."
+      analysis: analysisText
     });
 
   } catch (error: unknown) {
