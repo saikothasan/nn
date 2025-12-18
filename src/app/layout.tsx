@@ -15,8 +15,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Professional Dev Tools",
-  description: "A suite of high-performance developer tools.",
+  metadataBase: new URL('https://prokit.uk'), // <--- 1. Set your Domain
+  title: {
+    default: "ProKit - Professional Developer Tools",
+    template: "%s | ProKit"
+  },
+  description: "A suite of high-performance developer tools for AI, Security, and DNS.",
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://prokit.uk',
+    siteName: 'ProKit',
+  }
 };
 
 export default function RootLayout({
@@ -26,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-white dark:bg-black text-gray-900 dark:text-gray-100`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100`}>
         <Header />
         <main className="flex-1 w-full">
           {children}
