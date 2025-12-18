@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "bb",
   "main": ".open-next/worker.js",
-  "compatibility_date": "2025-12-01",
+  "compatibility_date": "2024-12-18",
   "compatibility_flags": [
     "nodejs_compat",
     "global_fetch_strictly_public"
@@ -16,8 +16,7 @@
   "observability": {
     "enabled": true
   },
-  // "Smart Placement" automatically moves your worker code closer to your D1 Database/R2
-  // This drastically reduces latency for database-heavy tools (like Bin Lookup).
+  // Optimizes latency by moving worker near D1/R2
   "placement": { 
     "mode": "smart" 
   },
@@ -27,18 +26,18 @@
     {
       "binding": "DB",
       "database_name": "bin-db",
-      "database_id": "be1a4fee-8588-44af-b67e-16e61ce4ff0c" 
+      "database_id": "be1a4fee-8588-44af-b67e-16e61ce4ff0c"
     }
   ],
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "0e4ed3d2aea64f5d8badda1e6b9172ca"
+      "id": "ebdb43ac0bdd46f1bd3015de295ababf"
     }
   ],
   "r2_buckets": [
     {
-      // CRITICAL: This exact binding name enables the R2 Cache in open-next.config.ts
+      // This binding enables the R2 Cache in open-next.config.ts
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
       "bucket_name": "omni-agent-artifacts"
     },
@@ -49,7 +48,6 @@
   ],
 
   // 3. AI & BROWSER BINDINGS
-  // Allows you to build tools like "AI Text Generator" or "Website Screenshot"
   "ai": {
     "binding": "AI"
   },
@@ -62,14 +60,15 @@
     "binding": "IMAGES"
   },
 
-  // 5. SECURITY & RATE LIMITING
-  // Essential for "Professional" tools to prevent API abuse
+  // 5. SECURITY & RATE LIMITING (FIXED)
   "ratelimits": [
     {
       "binding": "RATE_LIMITER",
-      "namespace_id": "1001", 
-      "limit": 50,     // 50 Requests
-      "period": 10     // Per 10 Seconds
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 50,
+        "period": 10
+      }
     }
   ],
 
