@@ -45,7 +45,7 @@ export const tools: Tool[] = [
     category: 'ai',
     icon: Cpu,
     keywords: ['translation', 'ai language', 'polyglot', 'neural network'],
-    component: ComingSoon,
+    component: Translator,
   },
   {
     slug: 'dns-lookup',
