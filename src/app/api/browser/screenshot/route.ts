@@ -39,7 +39,8 @@ export async function GET(req: NextRequest) {
     await browser.close();
 
     // 5. Return Image Response
-    return new NextResponse(screenshotBuffer, {
+    // FIX: Cast to 'any' to avoid TypeScript "Buffer vs BodyInit" mismatch
+    return new NextResponse(screenshotBuffer as any, {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
