@@ -21,7 +21,6 @@ interface BinData {
 
 export default function BinChecker() {
   const [bin, setBin] = useState('');
-  // 2. Type the state
   const [data, setData] = useState<BinData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,11 +32,13 @@ export default function BinChecker() {
     
     try {
       const res = await fetch(`/api/bin-checker?bin=${bin}`);
-      const json = await res.json();
+      // FIX: Cast the response to 'any' or a specific type to access .error
+      const json = await res.json() as any; 
+      
       if (!res.ok) throw new Error(json.error || 'Failed to fetch');
+      
       setData(json.data);
     } catch (err) {
-      // 3. Type the error check
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -72,7 +73,6 @@ export default function BinChecker() {
 
       {data && (
         <div className="grid grid-cols-2 gap-4 text-sm">
-          {/* 4. Use specific rendering instead of Object.entries map with 'any' */}
           <ResultItem label="Brand" value={data.brand} />
           <ResultItem label="Type" value={data.type} />
           <ResultItem label="Category" value={data.category} />
@@ -85,7 +85,6 @@ export default function BinChecker() {
   );
 }
 
-// Helper component to avoid 'any' mapping
 function ResultItem({ label, value }: { label: string; value: string }) {
   if (!value) return null;
   return (
