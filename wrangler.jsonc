@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "bb",
+  "name": "nn",
   "main": ".open-next/worker.js",
   "compatibility_date": "2024-12-18",
   "compatibility_flags": [
@@ -74,7 +74,7 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "bb"
+      "service": "nn"
     }
   ]
 }
