@@ -1,5 +1,6 @@
 import { 
   Cpu,
+  ScanEye,
   Camera,
   Lock, 
   Globe, 
@@ -20,6 +21,10 @@ const BinChecker = dynamic(() => import('@/components/tools/security/BinChecker'
 // AI Tools (NEW IMPORT ADDED HERE)
 const Translator = dynamic(() => import('@/components/tools/ai/Translator'), {
   loading: () => <ToolLoader name="AI Translator" />,
+});
+
+const SiteAudit = dynamic(() => import('@/components/tools/ai/SiteAudit'), {
+  loading: () => <ToolLoader name="Site Audit" />,
 });
 
 // Browser Tool Import
@@ -50,6 +55,15 @@ export const tools: Tool[] = [
     icon: Lock,
     keywords: ['bin lookup', 'credit card validator', 'bank identifier', 'payment security'],
     component: BinChecker,
+  },
+  {
+    slug: 'site-audit-ai',
+    name: 'SiteScan AI Auditor',
+    description: 'Autonomous website auditing powered by Cloudflare Browser Rendering and AI Gateway.',
+    category: 'ai',
+    icon: ScanEye,
+    keywords: ['audit', 'seo', 'ux', 'ai', 'vision'],
+    component: SiteAudit,
   },
   {
     slug: 'website-screenshot',
