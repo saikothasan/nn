@@ -2,6 +2,13 @@
 import { useState } from 'react';
 import { ArrowRightLeft, Sparkles, Copy, Loader2 } from 'lucide-react';
 
+// 1. Define the Expected API Response Interface
+interface TranslationResponse {
+  success: boolean;
+  translated: string;
+  error?: string;
+}
+
 export default function Translator() {
   const [text, setText] = useState('');
   const [result, setResult] = useState('');
@@ -17,8 +24,15 @@ export default function Translator() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, targetLang: lang })
       });
-      const data = await res.json();
-      if (data.success) setResult(data.translated);
+      
+      // 2. Type Cast: Tell TypeScript what the data looks like
+      const data = (await res.json()) as TranslationResponse;
+      
+      if (data.success) {
+        setResult(data.translated);
+      } else {
+        console.error("Translation failed:", data.error);
+      }
     } catch (e) {
       console.error(e);
     } finally {
