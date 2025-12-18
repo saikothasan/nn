@@ -10,8 +10,15 @@ import React from 'react';
 import ComingSoon from '@/components/ui/ComingSoon';
 
 // --- 1. Dynamic Component Imports ---
+
+// Security Tools
 const BinChecker = dynamic(() => import('@/components/tools/security/BinChecker'), {
   loading: () => <ToolLoader name="BIN Checker" />,
+});
+
+// AI Tools (NEW IMPORT ADDED HERE)
+const Translator = dynamic(() => import('@/components/tools/ai/Translator'), {
+  loading: () => <ToolLoader name="AI Translator" />,
 });
 
 // --- 2. Type Definitions ---
@@ -45,7 +52,7 @@ export const tools: Tool[] = [
     category: 'ai',
     icon: Cpu,
     keywords: ['translation', 'ai language', 'polyglot', 'neural network'],
-    component: Translator,
+    component: Translator, // <--- Now this works because 'Translator' is defined above
   },
   {
     slug: 'dns-lookup',
