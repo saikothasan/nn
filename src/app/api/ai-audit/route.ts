@@ -6,9 +6,16 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 const R2_CUSTOM_DOMAIN = 'https://c.prokit.uk'; // Your R2 Domain
 const GATEWAY_ID = "vibesdk-gateway"; // The ID you provided
 
+// FIX: Define the expected request body shape
+interface AuditRequestBody {
+  url?: string;
+  focus?: string;
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    // FIX: Cast the json result to our interface
+    const body = (await req.json()) as AuditRequestBody;
     const { url, focus = "General Audit" } = body;
 
     if (!url) {
