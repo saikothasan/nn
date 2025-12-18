@@ -2,13 +2,12 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getTool, getToolsByCategory, tools } from '@/lib/tools-config';
 import { Metadata } from 'next';
-import { ChevronRight, Home, Share2, ShieldCheck } from 'lucide-react';
+import { ChevronRight, Home, Share2, ShieldCheck, Send } from 'lucide-react';
 
 type Props = {
   params: Promise<{ slug: string }>
 };
 
-// 1. Dynamic SEO Generation
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const tool = getTool(slug);
@@ -16,18 +15,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!tool) return { title: 'Tool Not Found' };
 
   return {
-    title: `${tool.name} - Free Online Tools`,
+    title: `${tool.name} - Free Online Tool | ProKit`,
     description: tool.description,
     keywords: tool.keywords,
+    alternates: {
+      canonical: `https://prokit.uk/tool/${slug}`,
+    },
     openGraph: {
       title: tool.name,
       description: tool.description,
       type: 'website',
+      url: `https://prokit.uk/tool/${slug}`,
     }
   };
 }
 
-// 2. Static Generation
 export async function generateStaticParams() {
   return tools.map((tool) => ({
     slug: tool.slug,
@@ -43,7 +45,6 @@ export default async function ToolPage({ params }: Props) {
   const ToolComponent = tool.component;
   const relatedTools = getToolsByCategory(tool.category).filter(t => t.slug !== tool.slug).slice(0, 3);
 
-  // SEO Schema
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -51,6 +52,7 @@ export default async function ToolPage({ params }: Props) {
     operatingSystem: 'Web',
     applicationCategory: tool.category,
     description: tool.description,
+    url: `https://prokit.uk/tool/${slug}`,
     offers: {
       '@type': 'Offer',
       price: '0',
@@ -81,7 +83,7 @@ export default async function ToolPage({ params }: Props) {
           {/* Main Content Area */}
           <div className="lg:col-span-8 space-y-8">
             
-            {/* Tool Header Card */}
+            {/* Tool Header */}
             <div className="bg-white dark:bg-[#111] rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden">
               <div className="absolute top-0 right-0 p-6 opacity-10">
                 <tool.icon className="w-32 h-32" />
@@ -106,58 +108,44 @@ export default async function ToolPage({ params }: Props) {
               </div>
             </div>
 
-            {/* THE TOOL WORKSPACE */}
-            <div className="bg-white dark:bg-[#111] rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-none border border-gray-200 dark:border-gray-800 p-1">
-               <div className="bg-gray-50 dark:bg-[#0a0a0a] rounded-[22px] p-6 md:p-10 min-h-[500px] border border-gray-100 dark:border-gray-800/50">
-                 <ToolComponent />
-               </div>
-            </div>
+            {/* Tool Component (Includes its own SEO Text now) */}
+            <ToolComponent />
 
-            {/* SEO Content Article */}
-            <article className="prose prose-lg dark:prose-invert max-w-none bg-white dark:bg-[#111] p-8 md:p-12 rounded-3xl border border-gray-100 dark:border-gray-800">
-              <h2>About {tool.name}</h2>
-              <p>
-                The <strong>{tool.name}</strong> is a professional utility designed for developers and security professionals. 
-                Unlike other tools, we process data using Cloudflare's secure edge network, ensuring speed and privacy.
-              </p>
-              
-              <h3>Features</h3>
-              <ul>
-                <li><strong>Instant Results:</strong> Powered by Edge Computing.</li>
-                <li><strong>Privacy First:</strong> We do not store your personal data.</li>
-                <li><strong>Open Source:</strong> Transparent logic you can trust.</li>
-              </ul>
-
-              <h3>How to use</h3>
-              <p>
-                Simply enter the required input above and click the action button. The tool will instantly query our 
-                secure databases and return the results in a clean, JSON-structured format.
-              </p>
-            </article>
           </div>
 
-          {/* Sidebar / Related Tools */}
+          {/* Sidebar */}
           <aside className="lg:col-span-4 space-y-6">
             
-            {/* Share / Info Card */}
-            <div className="bg-blue-600 dark:bg-blue-600 rounded-3xl p-6 text-white shadow-lg shadow-blue-500/20">
+            {/* Telegram Promo Card (Sidebar) */}
+            <a 
+               href="https://t.me/drkingbd"
+               target="_blank"
+               className="block bg-[#0088cc] rounded-3xl p-6 text-white shadow-lg shadow-blue-500/20 hover:scale-[1.02] transition-transform"
+            >
               <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
-                <Share2 className="w-5 h-5" /> Share this tool
+                <Send className="w-5 h-5" /> Join our Telegram
               </h3>
-              <p className="text-blue-100 text-sm mb-6">
-                Help other developers by sharing this free utility.
+              <p className="text-blue-100 text-sm mb-4">
+                Get the latest tools, updates, and developer resources directly in your feed.
               </p>
+              <div className="bg-white/20 backdrop-blur-sm py-2 px-4 rounded-xl text-sm font-medium text-center hover:bg-white/30 transition-colors">
+                 @drkingbd
+              </div>
+            </a>
+
+            {/* Share Card */}
+            <div className="bg-white dark:bg-[#111] rounded-3xl p-6 border border-gray-100 dark:border-gray-800">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Share2 className="w-5 h-5" /> Share Tool
+              </h3>
               <div className="flex gap-2">
-                 <button className="flex-1 bg-white/20 hover:bg-white/30 backdrop-blur-sm py-2 rounded-xl text-sm font-medium transition-colors">
+                 <button className="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 py-2 rounded-xl text-sm font-medium transition-colors text-gray-700 dark:text-gray-300">
                    Copy Link
-                 </button>
-                 <button className="flex-1 bg-white text-blue-600 hover:bg-blue-50 py-2 rounded-xl text-sm font-medium transition-colors">
-                   Tweet
                  </button>
               </div>
             </div>
 
-            {/* Related Tools List */}
+            {/* Related Tools */}
             {relatedTools.length > 0 && (
               <div className="bg-white dark:bg-[#111] rounded-3xl p-6 border border-gray-100 dark:border-gray-800">
                 <h3 className="font-bold text-gray-900 dark:text-white mb-4">
@@ -176,9 +164,6 @@ export default async function ToolPage({ params }: Props) {
                       <div>
                         <div className="font-medium text-gray-900 dark:text-gray-200 text-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                           {t.name}
-                        </div>
-                        <div className="text-xs text-gray-500 line-clamp-1">
-                          {t.description}
                         </div>
                       </div>
                     </Link>
