@@ -16,7 +16,6 @@
   "observability": {
     "enabled": true
   },
-  // Optimizes latency by moving worker near D1/R2
   "placement": { 
     "mode": "smart" 
   },
@@ -37,7 +36,6 @@
   ],
   "r2_buckets": [
     {
-      // This binding enables the R2 Cache in open-next.config.ts
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
       "bucket_name": "omni-agent-artifacts"
     },
@@ -63,7 +61,7 @@
   // 5. SECURITY & RATE LIMITING (FIXED)
   "ratelimits": [
     {
-      "binding": "RATE_LIMITER",
+      "name": "RATE_LIMITER", // <--- CHANGED FROM "binding" TO "name"
       "namespace_id": "1001",
       "simple": {
         "limit": 50,
