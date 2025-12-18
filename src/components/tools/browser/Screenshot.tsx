@@ -34,8 +34,13 @@ export default function ScreenshotTool() {
       const objectUrl = URL.createObjectURL(blob);
       setImageUrl(objectUrl);
       
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      // FIX: Use 'unknown' and check if it is an Error object
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setLoading(false);
     }
