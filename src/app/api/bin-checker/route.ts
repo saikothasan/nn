@@ -1,22 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { parse } from 'csv-parse/sync';
 
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 
-// 1. Define the shape of your CSV Data
-interface BinRecord {
-  BIN: string;
-  Brand: string;
-  Type: string;
-  Category: string;
-  Issuer: string;
-  IssuerPhone: string;
-  IssuerUrl: string;
-  CountryName: string;
-  isoCode2: string;
-  isoCode3: string;
+// 1. Define the Upstream API Interface (What binlist.io returns)
+interface BinListResponse {
+  number: {
+    length: number;
+    luhn: boolean;
+  };
+  scheme: string;
+  type: string;
+  brand: string;
+  prepaid: boolean;
+  category: string;
+  country: {
+    numeric: string;
+    alpha2: string;
+    alpha3: string;
+    name: string;
+    emoji: string;
+    currency: string;
+    latitude: number;
+    longitude: number;
+  };
+  bank: {
+    name: string;
+    url: string;
+    phone: string;
+    city: string;
+  };
 }
 
 export async function GET(req: NextRequest) {
@@ -28,52 +40,57 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Please provide a "bin" query parameter.' }, { status: 400 });
     }
 
+    // Sanitize input: Binlist.io requires the first 6 or 8 digits
     const bin = binInput.replace(/\D/g, '').substring(0, 6);
 
     if (bin.length < 6) {
       return NextResponse.json({ error: 'BIN must contain at least 6 digits.' }, { status: 400 });
     }
 
-    const csvPath = path.join(process.cwd(), '@/data/bin-list-data.csv');
+    // 2. Fetch from External API
+    // Note: binlist.io has a rate limit (approx 10 requests/min for free tier).
+    const apiUrl = `https://binlist.io/lookup/${bin}`;
+    console.log(`Fetching upstream: ${apiUrl}`);
 
-    if (!fs.existsSync(csvPath)) {
-      console.error(`BIN data file not found at: ${csvPath}`);
-      return NextResponse.json({ error: 'Database source not found.' }, { status: 500 });
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Accept-Version': '3', // Good practice for external APIs
+      },
+    });
+
+    // Handle 404 (BIN not found) specifically
+    if (response.status === 404) {
+      return NextResponse.json({ success: false, error: 'BIN not found in global database.' }, { status: 404 });
     }
 
-    const fileContent = fs.readFileSync(csvPath, 'utf-8');
+    // Handle other errors (Rate limits, server errors)
+    if (!response.ok) {
+      console.error(`Upstream Error: ${response.status} ${response.statusText}`);
+      return NextResponse.json({ error: 'External service unavailable. Please try again later.' }, { status: 502 });
+    }
 
-    // 2. Add generic type to parse()
-    const records = parse(fileContent, {
-      columns: true,
-      skip_empty_lines: true,
-      trim: true,
-    }) as BinRecord[];
+    const data = (await response.json()) as BinListResponse;
 
-    // 3. Typed 'record' instead of 'any'
-    const match = records.find((record) => record.BIN === bin);
-
-    if (match) {
-      return NextResponse.json({
-        success: true,
-        data: {
-          bin: match.BIN,
-          brand: match.Brand,
-          type: match.Type,
-          category: match.Category,
-          issuer: match.Issuer,
-          issuer_phone: match.IssuerPhone,
-          issuer_url: match.IssuerUrl,
-          country: {
-            name: match.CountryName,
-            iso2: match.isoCode2,
-            iso3: match.isoCode3,
-          },
+    // 3. Adapter: Map External Data to Internal Format
+    // This ensures your frontend (BinChecker.tsx) works without ANY changes.
+    return NextResponse.json({
+      success: true,
+      data: {
+        bin: bin,
+        brand: data.scheme || 'Unknown', // "VISA", "MASTERCARD"
+        type: data.type || 'Unknown',   // "DEBIT", "CREDIT"
+        category: data.category || '',
+        issuer: data.bank?.name || 'Unknown',
+        issuer_phone: data.bank?.phone || '',
+        issuer_url: data.bank?.url || '',
+        country: {
+          name: data.country?.name || 'Unknown',
+          iso2: data.country?.alpha2 || '',
+          iso3: data.country?.alpha3 || '',
         },
-      });
-    } else {
-      return NextResponse.json({ success: false, error: 'BIN not found in database.' }, { status: 404 });
-    }
+      },
+    });
+
   } catch (error) {
     console.error('Error in bin-checker API:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
