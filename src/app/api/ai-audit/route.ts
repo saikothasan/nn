@@ -3,8 +3,8 @@ import puppeteer from '@cloudflare/puppeteer';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Configuration
-const R2_CUSTOM_DOMAIN = 'https://c.prokit.uk'; // Your R2 Domain
-const GATEWAY_ID = "vibesdk-gateway"; // The ID you provided
+const R2_CUSTOM_DOMAIN = 'https://c.prokit.uk';
+const GATEWAY_ID = "vibesdk-gateway";
 
 // FIX: Define the expected request body shape
 interface AuditRequestBody {
@@ -33,9 +33,7 @@ export async function POST(req: NextRequest) {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
     // 2. Extract Data (Text Content for AI)
-    // We grab the visible text to give the AI context about the page
     const pageText = await page.evaluate(() => {
-        // Simple heuristic to get main content text
         return document.body.innerText.slice(0, 5000); // Limit context window
     });
 
