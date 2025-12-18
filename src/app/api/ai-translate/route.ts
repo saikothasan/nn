@@ -3,15 +3,19 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export const runtime = 'edge';
 
-// 1. Define the expected shape of the request body
+// 1. Request Interface
 interface TranslateRequest {
   text: string;
   targetLang: string;
 }
 
+// 2. Response Interface (Fixes the "Unexpected any" error)
+interface AiTranslationResponse {
+  translated_text: string;
+}
+
 export async function POST(req: NextRequest) {
   try {
-    // 2. Cast the unknown JSON to our Interface
     const { text, targetLang } = (await req.json()) as TranslateRequest;
     
     if (!text || !targetLang) {
@@ -20,18 +24,16 @@ export async function POST(req: NextRequest) {
 
     const { env } = getCloudflareContext();
 
-    // 3. Run the AI Model
-    // Ensure you have an 'AI' binding in your wrangler.jsonc
+    // 3. Run AI Model
+    // We cast to 'unknown' first, then to our interface to satisfy TS rules
     const response = await env.AI.run('@cf/meta/m2m100-1.2b', {
       text: text,
       target_lang: targetLang
-    });
+    }) as unknown as AiTranslationResponse;
 
-    // The AI response type is usually 'any' or specific based on model, 
-    // but we can safely access translated_text here.
     return NextResponse.json({ 
       success: true, 
-      translated: (response as any).translated_text 
+      translated: response.translated_text 
     });
 
   } catch (error) {
