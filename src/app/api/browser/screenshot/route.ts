@@ -39,18 +39,23 @@ export async function GET(req: NextRequest) {
     await browser.close();
 
     // 5. Return Image Response
-    // FIX: Cast to 'any' to avoid TypeScript "Buffer vs BodyInit" mismatch
-    return new NextResponse(screenshotBuffer as any, {
+    // FIX: Use Blob instead of casting to 'any'
+    const imageBlob = new Blob([screenshotBuffer], { type: 'image/png' });
+
+    return new NextResponse(imageBlob, {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
       },
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    // FIX: Use 'unknown' and safe type checking
     console.error('Browser Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    
     return NextResponse.json(
-      { error: 'Failed to generate screenshot', details: error.message }, 
+      { error: 'Failed to generate screenshot', details: errorMessage }, 
       { status: 500 }
     );
   }
