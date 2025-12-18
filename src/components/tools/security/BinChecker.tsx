@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Search, Loader2 } from 'lucide-react';
 
-// 1. Define the response type
+// 1. Define the Bin Data Shape
 interface BinData {
   bin: string;
   brand: string;
@@ -19,6 +19,12 @@ interface BinData {
   };
 }
 
+// 2. Define the API Response Shape (Success or Error)
+type BinApiResponse = 
+  | { success: true; data: BinData }
+  | { success: false; error: string }
+  | { error: string }; // Handle cases where success flag might be missing
+
 export default function BinChecker() {
   const [bin, setBin] = useState('');
   const [data, setData] = useState<BinData | null>(null);
@@ -32,12 +38,23 @@ export default function BinChecker() {
     
     try {
       const res = await fetch(`/api/bin-checker?bin=${bin}`);
-      // FIX: Cast the response to 'any' or a specific type to access .error
-      const json = await res.json() as any; 
       
-      if (!res.ok) throw new Error(json.error || 'Failed to fetch');
+      // 3. Cast to the specific type instead of 'any'
+      const json = (await res.json()) as BinApiResponse; 
       
-      setData(json.data);
+      if (!res.ok) {
+        // Now TypeScript knows 'error' exists on BinApiResponse if it's an error shape
+        const errorMessage = 'error' in json ? json.error : 'Failed to fetch data';
+        throw new Error(errorMessage);
+      }
+      
+      // Narrowing: If we are here, and assuming success, we check for data
+      if ('data' in json) {
+        setData(json.data);
+      } else {
+         throw new Error('Invalid response format');
+      }
+
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
