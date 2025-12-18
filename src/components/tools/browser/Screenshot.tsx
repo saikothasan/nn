@@ -3,6 +3,15 @@
 import React, { useState } from 'react';
 import { Camera, Download, Loader2, AlertCircle, CheckCircle2, Globe, Monitor, Zap } from 'lucide-react';
 
+// FIX: Define the expected response shape
+interface ScreenshotResponse {
+  success?: boolean;
+  url?: string;
+  captured_at?: string;
+  error?: string;
+  details?: string;
+}
+
 export default function ScreenshotTool() {
   const [url, setUrl] = useState('');
   const [result, setResult] = useState<{ url: string; captured_at: string } | null>(null);
@@ -23,13 +32,15 @@ export default function ScreenshotTool() {
       
       const apiEndpoint = `/api/browser/screenshot?url=${encodeURIComponent(targetUrl)}`;
       const res = await fetch(apiEndpoint);
-      const data = await res.json();
+      
+      // FIX: Cast the response to our interface
+      const data = (await res.json()) as ScreenshotResponse;
 
       if (!res.ok) {
         throw new Error(data.details || data.error || 'Failed to capture screenshot');
       }
 
-      if (data.url) {
+      if (data.url && data.captured_at) {
         setResult({
           url: data.url,
           captured_at: data.captured_at
