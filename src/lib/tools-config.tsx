@@ -2,27 +2,19 @@ import {
   Cpu, 
   Lock, 
   Globe, 
-  Mail, 
+  // Mail, <--- Removed unused import
   Image as ImageIcon, 
   LucideIcon 
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import React from 'react';
+import ComingSoon from '@/components/ui/ComingSoon';
 
 // --- 1. Dynamic Component Imports ---
-// This ensures the heavy code for tools is only loaded when the user visits that tool.
 
 const BinChecker = dynamic(() => import('@/components/tools/security/BinChecker'), {
   loading: () => <ToolLoader name="BIN Checker" />,
 });
-
-// Placeholder for future tools (prevents errors for tools you haven't built yet)
-const ComingSoon = () => (
-  <div className="flex flex-col items-center justify-center p-12 text-center text-gray-500 bg-gray-50 dark:bg-gray-900 rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
-    <p className="text-lg font-medium">Tool Coming Soon</p>
-    <p className="text-sm">We are currently building this feature.</p>
-  </div>
-);
 
 // --- 2. Type Definitions ---
 
@@ -35,7 +27,7 @@ export interface Tool {
   category: ToolCategory;
   icon: LucideIcon;
   keywords: string[];
-  component: React.ComponentType; // The actual React Component to render
+  component: React.ComponentType; 
 }
 
 // --- 3. Configuration ---
@@ -57,7 +49,7 @@ export const tools: Tool[] = [
     category: 'ai',
     icon: Cpu,
     keywords: ['translation', 'ai language', 'polyglot', 'neural network'],
-    component: ComingSoon, // Replace with actual component when built
+    component: ComingSoon,
   },
   {
     slug: 'dns-lookup',
