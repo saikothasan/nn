@@ -17,6 +17,7 @@
 		"@cloudflare/ai-utils": "latest",
 		"@cloudflare/ai-gateway": "latest",
 		"crypto-js": "latest",
+		"gray-matter": "latest",
 		"framer-motion": "latest",
 		"next": "15.5.9",
 		"react-markdown": "latest",
@@ -28,6 +29,7 @@
 	"devDependencies": {
 		"@eslint/eslintrc": "^3",
 		"@faker-js/faker": "latest",
+		"@tailwindcss/typography": "latest",
 		"@types/crypto-js": "latest",
 		"@tailwindcss/postcss": "^4",
 		"@types/node": "^20.19.27",
