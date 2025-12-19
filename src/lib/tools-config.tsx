@@ -1,11 +1,11 @@
 import { 
   Cpu,
-  Bot,
   ScanEye,
   Camera,
   Lock, 
   Globe, 
-  Image as ImageIcon, 
+  Image as ImageIcon,
+  MapPin, // New Icon
   LucideIcon 
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -19,11 +19,7 @@ const BinChecker = dynamic(() => import('@/components/tools/security/BinChecker'
   loading: () => <ToolLoader name="BIN Checker" />,
 });
 
-const WebExtractor = dynamic(() => import('@/components/tools/ai/WebExtractor'), {
-  loading: () => <ToolLoader name="AI Web Scraper" />,
-});
-
-// AI Tools (NEW IMPORT ADDED HERE)
+// AI Tools
 const Translator = dynamic(() => import('@/components/tools/ai/Translator'), {
   loading: () => <ToolLoader name="AI Translator" />,
 });
@@ -32,13 +28,24 @@ const SiteAudit = dynamic(() => import('@/components/tools/ai/SiteAudit'), {
   loading: () => <ToolLoader name="Site Audit" />,
 });
 
-// Browser Tool Import
+// Browser Tools
 const ScreenshotTool = dynamic(() => import('@/components/tools/browser/Screenshot'), {
   loading: () => <ToolLoader name="Screenshot Tool" />,
 });
 
+const WebExtractor = dynamic(() => import('@/components/tools/ai/WebExtractor'), {
+  loading: () => <ToolLoader name="AI Web Scraper" />,
+});
+
+// NEW: Dev Tools
+const FakeAddressGenerator = dynamic(() => import('@/components/tools/dev/FakeAddressGenerator'), {
+  loading: () => <ToolLoader name="Fake Address Gen" />,
+});
+
+
 // --- 2. Type Definitions ---
-export type ToolCategory = 'ai' | 'security' | 'dns' | 'image' | 'email';
+// Added 'dev' to the type
+export type ToolCategory = 'ai' | 'security' | 'dns' | 'image' | 'email' | 'dev';
 
 export interface Tool {
   slug: string;
@@ -75,7 +82,7 @@ export const tools: Tool[] = [
     name: 'Smart Web Scraper',
     description: 'Extract specific data, summaries, or insights from any webpage using AI and Browser Rendering.',
     category: 'ai',
-    icon: Bot,
+    icon: Cpu,
     keywords: ['scraping', 'extraction', 'ai analysis', 'summary', 'data mining'],
     component: WebExtractor,
   },
@@ -89,13 +96,22 @@ export const tools: Tool[] = [
     component: ScreenshotTool,
   },
   {
+    slug: 'fake-address-generator',
+    name: 'Fake Address Generator',
+    description: 'Generate localized fake address data for testing and development in 50+ languages.',
+    category: 'dev',
+    icon: MapPin,
+    keywords: ['faker', 'mock data', 'address', 'testing', 'dev tool'],
+    component: FakeAddressGenerator,
+  },
+  {
     slug: 'ai-translator',
     name: 'AI Translator',
     description: 'Context-aware translation using Cloudflare Neural Networks.',
     category: 'ai',
-    icon: Cpu,
+    icon: Globe,
     keywords: ['translation', 'ai language', 'polyglot', 'neural network'],
-    component: Translator, // <--- Now this works because 'Translator' is defined above
+    component: Translator,
   },
   {
     slug: 'dns-lookup',
