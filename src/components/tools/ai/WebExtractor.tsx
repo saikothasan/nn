@@ -31,7 +31,8 @@ export default function WebExtractor() {
       } else {
         setResult(`Error: ${data.details || data.error}`);
       }
-    } catch (err) {
+    } catch {
+      // Removed the unused 'err' variable to satisfy linter
       setResult("Failed to connect to the extractor API.");
     } finally {
       setLoading(false);
