@@ -7,6 +7,11 @@ interface ExtractorRequestBody {
   query: string;
 }
 
+// Define the expected shape of the AI response
+interface AiResponse {
+  response?: string;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as ExtractorRequestBody;
@@ -26,23 +31,19 @@ export async function POST(req: NextRequest) {
     const browser = await puppeteer.launch(env.MY_BROWSER);
     const page = await browser.newPage();
     
-    // Set a reasonable viewport to ensure elements render
     await page.setViewport({ width: 1280, height: 800 });
 
     // 2. Navigate and Scrape
-    // networkidle0 is good for SPAs to ensure data is loaded
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 15000 });
 
-    // Clean extraction: Get visible text, remove excessive whitespace
     const pageText = await page.evaluate(() => {
-        // Simple heuristic to remove scripts/styles before getting text
         const scripts = document.querySelectorAll('script, style, noscript');
         scripts.forEach(s => s.remove());
         
         return document.body.innerText
-            .replace(/\s+/g, ' ') // normalize whitespace
+            .replace(/\s+/g, ' ')
             .trim()
-            .slice(0, 12000); // Token limit protection for Llama 3
+            .slice(0, 12000);
     });
 
     await browser.close();
@@ -56,7 +57,8 @@ export async function POST(req: NextRequest) {
 
     const userMessage = `Website Content:\n${pageText}\n\nUser Question:\n${query}`;
 
-    const aiResponse: any = await env.AI.run(
+    // Cast the response to our interface to avoid 'any'
+    const aiResponse = await env.AI.run(
       "@cf/meta/llama-3.1-8b-instruct",
       {
         messages: [
@@ -66,11 +68,11 @@ export async function POST(req: NextRequest) {
       },
       {
         gateway: {
-          id: "vibesdk-gateway", // Reuse your existing gateway ID
+          id: "vibesdk-gateway",
           skipCache: false
         }
       }
-    );
+    ) as unknown as AiResponse;
 
     const answer = aiResponse?.response || "No response generated.";
 
@@ -79,10 +81,13 @@ export async function POST(req: NextRequest) {
       data: answer
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Extractor Error:', error);
+    // Properly handle the 'unknown' error type
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
     return NextResponse.json(
-      { error: 'Extraction failed', details: error.message }, 
+      { error: 'Extraction failed', details: errorMessage }, 
       { status: 500 }
     );
   }
