@@ -14,6 +14,10 @@
 	},
 	"dependencies": {
 		"@opennextjs/cloudflare": "^1.14.4",
+		"@cloudflare/ai-utils": "latest",
+		"@cloudflare/ai-gateway": "latest",
+		"crypto-js": "latest",
+		"framer-motion": "latest",
 		"next": "15.5.9",
 		"react-markdown": "latest",
 		"lucide-react": "latest",
@@ -23,6 +27,8 @@
 	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3",
+		"@faker-js/faker": "latest",
+		"@types/crypto-js": "latest",
 		"@tailwindcss/postcss": "^4",
 		"@types/node": "^20.19.27",
 		"@types/react": "^19",
