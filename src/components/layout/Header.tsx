@@ -86,7 +86,7 @@ export function Header() {
                 <Send size={16} /> Join Telegram
               </Link>
               <Link 
-                href="https://github.com/saikothasan/nn"
+                href="https://github.com/saikothasan/Prokit"
                 target="_blank" 
                 className="flex items-center justify-center gap-2 w-full p-3 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-medium"
               >
