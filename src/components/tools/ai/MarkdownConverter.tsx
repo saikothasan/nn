@@ -3,6 +3,13 @@
 import React, { useState } from 'react';
 import { Search, Copy, Check, FileText } from 'lucide-react';
 
+// 1. Define the expected shape of the API response
+interface ConverterResponse {
+  success?: boolean;
+  data?: string;
+  error?: string;
+}
+
 export default function MarkdownConverter() {
   const [url, setUrl] = useState('');
   const [result, setResult] = useState('');
@@ -20,14 +27,16 @@ export default function MarkdownConverter() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
       });
-      const data = await res.json();
+
+      // 2. Cast the response to the interface
+      const data = (await res.json()) as ConverterResponse;
+
       if (data.success) {
-        setResult(data.data);
+        setResult(data.data || '');
       } else {
         setResult(`Error: ${data.error}`);
       }
     } catch (err) {
-      // Fix: Log the error so the variable is 'used'
       console.error('Conversion request failed:', err);
       setResult('Failed to connect to the server.');
     } finally {
