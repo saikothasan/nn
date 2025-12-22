@@ -79,16 +79,15 @@ export async function POST(req: NextRequest) {
       ]
     });
 
-    // Fix 1: Use @ts-expect-error because we know the type might be loose in some setups
-    // @ts-expect-error: Cloudflare AI types return structure varies dynamically
-    const markdown = response.response || "Failed to generate markdown.";
+    // Fix: Removed @ts-expect-error as the type is valid in your environment
+    // Use type assertion 'as any' just in case specific types are missing properties
+    const markdown = (response as any).response || "Failed to generate markdown.";
 
     return NextResponse.json({ success: true, data: markdown });
 
-  } catch (error: unknown) { // Fix 2: Use 'unknown' instead of 'any'
+  } catch (error: unknown) {
     console.error('Markdown Error:', error);
     
-    // Safely extract the error message
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     
     return NextResponse.json({ error: errorMessage }, { status: 500 });
