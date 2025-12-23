@@ -3,11 +3,20 @@
 import React, { useState } from 'react';
 import { Globe, Search, Loader2, AlertCircle } from 'lucide-react';
 
+// Define a flexible type for the DNS records since they vary by type (string[], objects, etc.)
+type DnsRecord = string[] | Record<string, unknown>[] | string[][] | unknown;
+
+interface DnsApiResponse {
+  success: boolean;
+  data?: DnsRecord;
+  error?: string;
+}
+
 export default function DnsLookupTool() {
   const [domain, setDomain] = useState('');
   const [recordType, setRecordType] = useState('A');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<DnsRecord | null>(null);
   const [error, setError] = useState('');
 
   const handleLookup = async (e: React.FormEvent) => {
@@ -25,14 +34,15 @@ export default function DnsLookupTool() {
         body: JSON.stringify({ domain, type: recordType }),
       });
       
-      const data = await res.json();
+      const data = (await res.json()) as DnsApiResponse;
       
-      if (data.success) {
+      if (data.success && data.data) {
         setResult(data.data);
       } else {
         setError(data.error || 'Failed to fetch records');
       }
-    } catch (err) {
+    } catch {
+      // Removed unused 'err' variable to satisfy linter
       setError('Network error occurred');
     } finally {
       setLoading(false);
