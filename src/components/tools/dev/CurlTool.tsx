@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Play, Plus, Trash2, Clock, CheckCircle, AlertTriangle, Copy } from 'lucide-react';
+import { Terminal, Play, Plus, Trash2, Clock, Copy } from 'lucide-react';
 
 interface HeaderItem {
   key: string;
@@ -74,7 +74,6 @@ export default function CurlTool() {
         }),
       });
       
-      // FIX: Explicitly cast the response to the interface
       const data = (await res.json()) as CurlResponse;
       setResponse(data);
 
