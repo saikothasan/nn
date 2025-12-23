@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as dns } from 'node:dns';
 
- // Force Node.js runtime compatibility
 
 interface DnsRequest {
   domain: string;
@@ -16,11 +15,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Domain is required' }, { status: 400 });
     }
 
-    let result;
-    
-    // Cloudflare Workers node:dns implementation limitations:
-    // 'lookup' (which uses OS host file) is NOT supported.
-    // We must use specific resolve methods.
+    let result: unknown;
+
     switch (type) {
       case 'A':
         result = await dns.resolve4(domain);
@@ -45,10 +41,12 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data: result });
-  } catch (error: any) {
-    // Handle DNS errors gracefully (e.g., ENODATA, ENOTFOUND)
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorCode = error && typeof error === 'object' && 'code' in error ? (error as { code: string }).code : undefined;
+
     return NextResponse.json(
-      { success: false, error: error.code || error.message }, 
+      { success: false, error: errorCode || errorMessage },
       { status: 500 }
     );
   }
