@@ -73,8 +73,11 @@ export default function CurlTool() {
           body: (method !== 'GET' && method !== 'HEAD') ? body : undefined
         }),
       });
-      const data = await res.json();
+      
+      // FIX: Explicitly cast the response to the interface
+      const data = (await res.json()) as CurlResponse;
       setResponse(data);
+
     } catch (err) {
       console.error(err);
       alert('Failed to execute request');
