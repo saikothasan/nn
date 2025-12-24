@@ -3,9 +3,16 @@
 import { useState } from 'react';
 import { Key, Copy, RefreshCw } from 'lucide-react';
 
+interface CryptoResult {
+  publicKey?: string;
+  privateKey?: string;
+  key?: string;
+  secret?: string;
+}
+
 export default function CryptoLab() {
   const [type, setType] = useState('rsa');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<CryptoResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   const generate = async () => {
@@ -45,7 +52,7 @@ export default function CryptoLab() {
               <pre className="p-4 bg-gray-900 text-green-400 rounded-lg text-xs overflow-x-auto mt-1">
                 {result.publicKey}
               </pre>
-              <button onClick={() => copy(result.publicKey)} className="absolute top-8 right-2 p-2 bg-gray-800 text-white rounded hover:bg-gray-700 opacity-0 group-hover:opacity-100 transition">
+              <button onClick={() => result.publicKey && copy(result.publicKey)} className="absolute top-8 right-2 p-2 bg-gray-800 text-white rounded hover:bg-gray-700 opacity-0 group-hover:opacity-100 transition">
                 <Copy size={14} />
               </button>
             </div>
@@ -56,7 +63,7 @@ export default function CryptoLab() {
               <pre className="p-4 bg-gray-900 text-red-400 rounded-lg text-xs overflow-x-auto mt-1">
                 {result.privateKey}
               </pre>
-               <button onClick={() => copy(result.privateKey)} className="absolute top-8 right-2 p-2 bg-gray-800 text-white rounded hover:bg-gray-700 opacity-0 group-hover:opacity-100 transition">
+               <button onClick={() => result.privateKey && copy(result.privateKey)} className="absolute top-8 right-2 p-2 bg-gray-800 text-white rounded hover:bg-gray-700 opacity-0 group-hover:opacity-100 transition">
                 <Copy size={14} />
               </button>
             </div>
@@ -64,13 +71,13 @@ export default function CryptoLab() {
           {result.key && (
              <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg flex justify-between items-center">
                 <code className="text-lg font-mono text-blue-600 dark:text-blue-400">{result.key}</code>
-                <button onClick={() => copy(result.key)}><Copy size={18} className="text-gray-400 hover:text-gray-600" /></button>
+                <button onClick={() => result.key && copy(result.key)}><Copy size={18} className="text-gray-400 hover:text-gray-600" /></button>
              </div>
           )}
            {result.secret && (
              <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg flex justify-between items-center">
                 <code className="text-sm font-mono break-all text-purple-600 dark:text-purple-400">{result.secret}</code>
-                <button onClick={() => copy(result.secret)}><Copy size={18} className="text-gray-400 hover:text-gray-600" /></button>
+                <button onClick={() => result.secret && copy(result.secret)}><Copy size={18} className="text-gray-400 hover:text-gray-600" /></button>
              </div>
           )}
         </div>
