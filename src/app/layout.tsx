@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google"; //
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://prokit.uk'), // <--- 1. Set your Domain
+  metadataBase: new URL('https://prokit.uk'),
   title: {
     default: "ProKit - Professional Developer Tools",
     template: "%s | ProKit"
@@ -26,7 +27,11 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://prokit.uk',
     siteName: 'ProKit',
-  }
+  },
+  // Optional: Add this if you want to verify ownership via meta tag instead of file upload
+  verification: {
+    google: "YOUR_GOOGLE_VERIFICATION_CODE", 
+  },
 };
 
 export default function RootLayout({
@@ -42,6 +47,8 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        {/* Replace 'GA_MEASUREMENT_ID' with your actual ID (e.g., G-XXXXXXXXXX) */}
+        <GoogleAnalytics gaId="G-8BD9FQ2S2H" /> 
       </body>
     </html>
   );
