@@ -21,7 +21,8 @@ export default function CryptoLab() {
       method: 'POST',
       body: JSON.stringify({ type, length: 2048 })
     });
-    setResult(await res.json());
+    const data = (await res.json()) as CryptoResult;
+    setResult(data);
     setLoading(false);
   };
 
