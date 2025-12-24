@@ -1,11 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { ShieldCheck, Search, AlertCircle, CheckCircle } from 'lucide-react';
+import { ShieldCheck, Search, AlertCircle } from 'lucide-react';
+
+interface SslData {
+  days_remaining: number;
+  valid_from: string;
+  valid_to: string;
+  protocol: string;
+  cipher: string;
+  fingerprint: string;
+  subject: { CN: string };
+  issuer: { O: string };
+}
 
 export default function SslInspector() {
   const [domain, setDomain] = useState('');
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<SslData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,8 +31,9 @@ export default function SslInspector() {
       const json = await res.json();
       if (json.error) throw new Error(json.error);
       setData(json);
-    } catch (err: any) {
-      setError(err.message || 'Failed to inspect certificate');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to inspect certificate';
+      setError(message);
     } finally {
       setLoading(false);
     }
