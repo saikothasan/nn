@@ -9,6 +9,11 @@ interface PortResult {
   service: string;
 }
 
+interface PortScanResponse {
+  results?: PortResult[];
+  error?: string;
+}
+
 export default function PortScanner() {
   const [host, setHost] = useState('');
   const [results, setResults] = useState<PortResult[]>([]);
@@ -21,7 +26,7 @@ export default function PortScanner() {
     
     try {
       const res = await fetch(`/api/port-scan?host=${host}`);
-      const data = await res.json();
+      const data = (await res.json()) as PortScanResponse;
       if (data.results) setResults(data.results);
     } catch (err) {
       console.error(err);
