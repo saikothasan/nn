@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { Upload, Download, ArrowRight } from 'lucide-react';
 
-// Define the type for the result
 interface OptimizationResult {
   originalSize: number;
   optimizedSize: number;
   success: boolean;
   format: string;
+  error?: string;
 }
 
 export default function ImageOptimizer() {
@@ -24,7 +24,8 @@ export default function ImageOptimizer() {
     fd.append('format', 'webp');
     
     const res = await fetch('/api/image-optimizer', { method: 'POST', body: fd });
-    setResult(await res.json());
+    const data = (await res.json()) as OptimizationResult;
+    setResult(data);
     setLoading(false);
   };
 
