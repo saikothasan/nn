@@ -15,6 +15,7 @@
 	"dependencies": {
 		"@opennextjs/cloudflare": "^1.14.4",
 		"@cloudflare/ai-utils": "latest",
+		"@next/third-parties": "latest",
 		"@cloudflare/ai-gateway": "latest",
 		"crypto-js": "latest",
 		"gray-matter": "latest",
