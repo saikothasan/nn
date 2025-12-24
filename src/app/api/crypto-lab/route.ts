@@ -1,11 +1,18 @@
 import { generateKeyPairSync, randomBytes } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { type, length } = body;
+// Define the expected shape of the request body
+interface CryptoRequestBody {
+  type: string;
+  length?: number;
+}
 
+export async function POST(req: NextRequest) {
   try {
+    // Cast the unknown result to our interface
+    const body = (await req.json()) as CryptoRequestBody;
+    const { type, length } = body;
+
     let result = {};
 
     if (type === 'rsa') {
