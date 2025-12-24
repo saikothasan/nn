@@ -7,12 +7,14 @@ import {
   Lock, 
   Globe, 
   Image as ImageIcon,
-  MapPin, // New Icon
+  MapPin,
+  ShieldCheck, // New: for SSL
+  Server,      // New: for Port Scanner
+  Key,         // New: for Crypto Lab
   LucideIcon 
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import React from 'react';
-import ComingSoon from '@/components/ui/ComingSoon';
 
 // --- 1. Dynamic Component Imports ---
 
@@ -21,18 +23,37 @@ const BinChecker = dynamic(() => import('@/components/tools/security/BinChecker'
   loading: () => <ToolLoader name="BIN Checker" />,
 });
 
+const SslInspector = dynamic(() => import('@/components/tools/security/SslInspector'), {
+  loading: () => <ToolLoader name="SSL Inspector" />,
+});
+
+const PortScanner = dynamic(() => import('@/components/tools/security/PortScanner'), {
+  loading: () => <ToolLoader name="Port Scanner" />,
+});
+
+const CryptoLab = dynamic(() => import('@/components/tools/security/CryptoLab'), {
+  loading: () => <ToolLoader name="Crypto Lab" />,
+});
+
+// DNS Tools
 const DnsLookup = dynamic(() => import('@/components/tools/dns/DnsLookup'), {
   loading: () => <ToolLoader name="DNS Lookup" />,
 });
 
+// Dev Tools
 const CurlRunner = dynamic(() => import('@/components/tools/dev/CurlTool'), {
   loading: () => <ToolLoader name="Curl Runner" />,
 });
 
+const FakeAddressGenerator = dynamic(() => import('@/components/tools/dev/FakeAddressGenerator'), {
+  loading: () => <ToolLoader name="Fake Address Gen" />,
+});
+
+// AI Tools
 const MarkdownConverter = dynamic(() => import('@/components/tools/ai/MarkdownConverter'), {
   loading: () => <ToolLoader name="AI Markdown Converter" />,
 });
-// AI Tools
+
 const Translator = dynamic(() => import('@/components/tools/ai/Translator'), {
   loading: () => <ToolLoader name="AI Translator" />,
 });
@@ -41,23 +62,21 @@ const SiteAudit = dynamic(() => import('@/components/tools/ai/SiteAudit'), {
   loading: () => <ToolLoader name="Site Audit" />,
 });
 
-// Browser Tools
-const ScreenshotTool = dynamic(() => import('@/components/tools/browser/Screenshot'), {
-  loading: () => <ToolLoader name="Screenshot Tool" />,
-});
-
 const WebExtractor = dynamic(() => import('@/components/tools/ai/WebExtractor'), {
   loading: () => <ToolLoader name="AI Web Scraper" />,
 });
 
-// NEW: Dev Tools
-const FakeAddressGenerator = dynamic(() => import('@/components/tools/dev/FakeAddressGenerator'), {
-  loading: () => <ToolLoader name="Fake Address Gen" />,
+// Browser/Image Tools
+const ScreenshotTool = dynamic(() => import('@/components/tools/browser/Screenshot'), {
+  loading: () => <ToolLoader name="Screenshot Tool" />,
+});
+
+const ImageOptimizer = dynamic(() => import('@/components/tools/image/ImageOptimizer'), {
+  loading: () => <ToolLoader name="Image Optimizer" />,
 });
 
 
 // --- 2. Type Definitions ---
-// Added 'dev' to the type
 export type ToolCategory = 'ai' | 'security' | 'dns' | 'image' | 'email' | 'dev';
 
 export interface Tool {
@@ -72,6 +91,7 @@ export interface Tool {
 
 // --- 3. Configuration ---
 export const tools: Tool[] = [
+  // --- Security ---
   {
     slug: 'bin-checker',
     name: 'BIN Checker',
@@ -82,6 +102,35 @@ export const tools: Tool[] = [
     component: BinChecker,
   },
   {
+    slug: 'ssl-inspector',
+    name: 'SSL/TLS Inspector',
+    description: 'Deep analyze SSL certificates, expiry dates, and handshake protocols.',
+    category: 'security',
+    icon: ShieldCheck,
+    keywords: ['ssl', 'cert', 'https', 'security', 'tls', 'inspector'],
+    component: SslInspector,
+  },
+  {
+    slug: 'port-scanner',
+    name: 'TCP Port Scanner',
+    description: 'Scan common ports (FTP, SSH, HTTP, SQL) on any target server or IP.',
+    category: 'security',
+    icon: Server,
+    keywords: ['nmap', 'port', 'network', 'tcp', 'open ports'],
+    component: PortScanner,
+  },
+  {
+    slug: 'crypto-lab',
+    name: 'Crypto Key Generator',
+    description: 'Generate production-grade RSA keys, API secrets, and JWT tokens.',
+    category: 'security',
+    icon: Key,
+    keywords: ['rsa', 'crypto', 'generator', 'secret', 'jwt', 'key pair'],
+    component: CryptoLab,
+  },
+
+  // --- AI ---
+  {
     slug: 'site-audit-ai',
     name: 'SiteScan AI Auditor',
     description: 'Autonomous website auditing powered by Cloudflare Browser Rendering and AI Gateway.',
@@ -91,23 +140,34 @@ export const tools: Tool[] = [
     component: SiteAudit,
   },
   {
-  slug: 'ai-markdown-converter',
-  name: 'AI Markdown Converter',
-  description: 'Convert any website into clean, structured Markdown using AI.',
-  category: 'ai',
-  icon: FileText, // Make sure to import FileText from 'lucide-react'
-  keywords: ['markdown', 'converter', 'html to markdown', 'web scraper'],
-  component: MarkdownConverter,
-},
+    slug: 'ai-markdown-converter',
+    name: 'AI Markdown Converter',
+    description: 'Convert any website into clean, structured Markdown using AI.',
+    category: 'ai',
+    icon: FileText,
+    keywords: ['markdown', 'converter', 'html to markdown', 'web scraper'],
+    component: MarkdownConverter,
+  },
   {
     slug: 'ai-web-scraper',
     name: 'Smart Web Scraper',
-    description: 'Extract specific data, summaries, or insights from any webpage using AI and Browser Rendering.',
+    description: 'Extract specific data, summaries, or insights from any webpage using AI.',
     category: 'ai',
     icon: Cpu,
     keywords: ['scraping', 'extraction', 'ai analysis', 'summary', 'data mining'],
     component: WebExtractor,
   },
+  {
+    slug: 'ai-translator',
+    name: 'AI Translator',
+    description: 'Context-aware translation using Cloudflare Neural Networks.',
+    category: 'ai',
+    icon: Globe,
+    keywords: ['translation', 'ai language', 'polyglot', 'neural network'],
+    component: Translator,
+  },
+
+  // --- Image ---
   {
     slug: 'website-screenshot',
     name: 'Website Screenshot',
@@ -118,32 +178,36 @@ export const tools: Tool[] = [
     component: ScreenshotTool,
   },
   {
+    slug: 'image-optimizer',
+    name: 'Image Optimizer',
+    description: 'Compress and resize images to WebP/AVIF without losing quality.',
+    category: 'image',
+    icon: ImageIcon,
+    keywords: ['image compression', 'webp converter', 'resize', 'avif'],
+    component: ImageOptimizer,
+  },
+
+  // --- Dev ---
+  {
     slug: 'fake-address-generator',
     name: 'Fake Address Generator',
-    description: 'Generate localized fake address data for testing and development in 50+ languages.',
+    description: 'Generate localized fake address data for testing in 50+ languages.',
     category: 'dev',
     icon: MapPin,
     keywords: ['faker', 'mock data', 'address', 'testing', 'dev tool'],
     component: FakeAddressGenerator,
   },
   {
-  slug: 'curl-runner',
-  name: 'Curl Runner',
-  description: 'Execute HTTP requests from the Edge. Inspect status, headers, and performance.',
-  category: 'dev',
-  icon: Terminal, // Import Terminal from 'lucide-react'
-  keywords: ['curl', 'http client', 'api tester', 'fetch'],
-  component: CurlRunner,
-},
-  {
-    slug: 'ai-translator',
-    name: 'AI Translator',
-    description: 'Context-aware translation using Cloudflare Neural Networks.',
-    category: 'ai',
-    icon: Globe,
-    keywords: ['translation', 'ai language', 'polyglot', 'neural network'],
-    component: Translator,
+    slug: 'curl-runner',
+    name: 'Curl Runner',
+    description: 'Execute HTTP requests from the Edge. Inspect status, headers, and performance.',
+    category: 'dev',
+    icon: Terminal,
+    keywords: ['curl', 'http client', 'api tester', 'fetch'],
+    component: CurlRunner,
   },
+
+  // --- DNS ---
   {
     slug: 'dns-lookup',
     name: 'DNS Propagation',
@@ -152,15 +216,6 @@ export const tools: Tool[] = [
     icon: Globe,
     keywords: ['whois', 'dns check', 'mx records', 'domain propagation'],
     component: DnsLookup,
-  },
-  {
-    slug: 'image-optimizer',
-    name: 'Image Optimizer',
-    description: 'Compress and resize images without losing quality.',
-    category: 'image',
-    icon: ImageIcon,
-    keywords: ['image compression', 'webp converter', 'resize'],
-    component: ComingSoon,
   },
 ];
 
