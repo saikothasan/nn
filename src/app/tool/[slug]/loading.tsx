@@ -1,20 +1,43 @@
-import { Loader2 } from "lucide-react";
+import { Terminal, Loader2 } from "lucide-react";
 
 export default function Loading() {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12 animate-pulse">
-      {/* Header Skeleton */}
-      <div className="mb-10 text-center space-y-4">
-        <div className="w-16 h-16 bg-gray-200 dark:bg-gray-800 rounded-xl mx-auto"></div>
-        <div className="h-10 bg-gray-200 dark:bg-gray-800 rounded-lg max-w-sm mx-auto"></div>
-        <div className="h-6 bg-gray-100 dark:bg-gray-900 rounded-lg max-w-2xl mx-auto"></div>
-      </div>
+    <div className="min-h-[80vh] flex flex-col items-center justify-center bg-[var(--background)]">
+      
+      <div className="max-w-md w-full border border-[var(--border)] bg-[var(--muted)]/20 p-8 rounded-sm text-center">
+        
+        {/* Icon Animation */}
+        <div className="flex justify-center mb-6">
+          <div className="relative">
+            <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
+            <div className="relative bg-[var(--background)] border border-[var(--border)] p-4 rounded-sm">
+              <Terminal className="w-8 h-8 text-[var(--foreground)]" />
+            </div>
+          </div>
+        </div>
 
-      {/* Tool Interface Skeleton */}
-      <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 h-[400px] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-2 text-gray-400">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-          <span className="text-sm font-medium">Loading Tool Environment...</span>
+        {/* Text Status */}
+        <h2 className="text-lg font-bold text-[var(--foreground)] tracking-tight mb-2">
+          Initializing Environment
+        </h2>
+        
+        {/* Console Log Simulation */}
+        <div className="font-mono text-xs text-[var(--muted-foreground)] space-y-1 mb-6 text-left bg-[var(--background)] p-4 border border-[var(--border)] h-24 overflow-hidden">
+          <div className="flex gap-2">
+            <span className="text-emerald-500">✓</span> <span>Loading Edge Runtime...</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="text-emerald-500">✓</span> <span>Verifying security headers...</span>
+          </div>
+          <div className="flex gap-2 animate-pulse">
+            <span className="text-blue-500">➜</span> <span>Mounting tool component...</span>
+          </div>
+        </div>
+
+        {/* Spinner */}
+        <div className="flex items-center justify-center gap-2 text-xs font-medium text-[var(--muted-foreground)]">
+           <Loader2 className="w-3.5 h-3.5 animate-spin" />
+           <span>PLEASE WAIT</span>
         </div>
       </div>
     </div>
