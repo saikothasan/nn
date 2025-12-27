@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   MapPin, RefreshCw, Copy, Check, Globe, 
   User, CreditCard, Wifi, LayoutList, FileJson,
-  Search, Link as LinkIcon
+  Link as LinkIcon
 } from 'lucide-react';
 
 // Full list of Faker v8+ supported locales
@@ -177,7 +177,6 @@ function GeneratorContent() {
   const [data, setData] = useState<FakeIdentity | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'json'>('details');
-  const [searchTerm, setSearchTerm] = useState('');
 
   // Update URL when locale changes
   const handleLocaleChange = (newLocale: string) => {
@@ -208,13 +207,8 @@ function GeneratorContent() {
   // Effect: Generate data when locale changes or on mount
   useEffect(() => {
     generateData(locale);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale]);
-
-  // Filtered locales for dropdown
-  const filteredLocales = ALL_LOCALES.filter(l => 
-    l.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    l.code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const currentLocaleName = ALL_LOCALES.find(l => l.code === locale)?.name || locale;
 
@@ -252,7 +246,6 @@ function GeneratorContent() {
               <option key={l.code} value={l.code}>{l.name} ({l.code})</option>
             ))}
           </select>
-          {/* Optional: Add a custom search input overlay if you want true search, but native select is accessible */}
         </div>
 
         <button 
@@ -294,6 +287,7 @@ function GeneratorContent() {
              </div>
              
              <div className="flex items-center gap-4 mb-6 p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl">
+                 {/* eslint-disable-next-line @next/next/no-img-element */}
                  <img src={data.identity.avatar} alt="Avatar" className="w-16 h-16 rounded-full bg-zinc-200" />
                  <div>
                     <div className="font-bold text-lg text-zinc-900 dark:text-white">{data.identity.fullName}</div>
