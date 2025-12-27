@@ -3,16 +3,16 @@
 import React, { useState } from 'react';
 import { 
   Play, Loader2, AlertCircle, Globe, 
-  Gauge, Activity, Terminal, Download,
+  Gauge, Activity, Terminal,
   Layout, FileSearch
 } from 'lucide-react';
 
+// Defines the exact shape of the API response to avoid 'any'
 interface TestResult {
   success: boolean;
   testId: string;
   urls: {
     screenshot: string;
-    trace: string;
   };
   data: {
     metrics: {
@@ -22,7 +22,7 @@ interface TestResult {
       fcp: number;
       duration: number;
     };
-    console: { type: string; text: string; location?: any }[];
+    console: { type: string; text: string; location?: string }[];
   };
 }
 
@@ -39,6 +39,7 @@ export default function TestAgent() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setActiveTab('overview');
 
     try {
       const targetUrl = url.startsWith('http') ? url : `https://${url}`;
@@ -50,9 +51,15 @@ export default function TestAgent() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Test failed');
-      setResult(data);
+      
+      // Type assertion here ensures we don't carry 'any' forward
+      setResult(data as TestResult);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -66,8 +73,8 @@ export default function TestAgent() {
           Playwright Testing Agent
         </h2>
         <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-          Run deep diagnostic tests using Cloudflare's Browser Rendering. 
-          Captures screenshots, console logs, and a full Playwright Trace.
+          Run deep diagnostic tests using Cloudflare&apos;s Browser Rendering. 
+          Captures screenshots, console logs, and Core Web Vitals.
         </p>
       </div>
 
@@ -141,21 +148,11 @@ export default function TestAgent() {
                 <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 flex flex-col justify-center items-center text-center space-y-4">
                   <FileSearch className="w-12 h-12 text-zinc-300" />
                   <div>
-                    <h3 className="text-lg font-semibold">Playwright Trace Available</h3>
+                    <h3 className="text-lg font-semibold">Test Successful</h3>
                     <p className="text-sm text-zinc-500 max-w-xs mx-auto">
-                      Download the trace file to inspect every action, network request, and snapshot in the Playwright Trace Viewer.
+                      Screenshot and metrics captured successfully via Cloudflare Browser Rendering.
                     </p>
                   </div>
-                  <a 
-                    href={result.urls.trace} 
-                    download 
-                    className="flex items-center gap-2 bg-zinc-900 dark:bg-white text-white dark:text-black px-6 py-2 rounded-full font-medium hover:opacity-90 transition-opacity"
-                  >
-                    <Download className="w-4 h-4" /> Download Trace
-                  </a>
-                  <a href="https://trace.playwright.dev/" target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-500 hover:underline">
-                    Open in Trace Viewer
-                  </a>
                 </div>
               </div>
             </div>
@@ -185,7 +182,8 @@ export default function TestAgent() {
   );
 }
 
-function MetricCard({ label, value, unit, icon: Icon, color }: any) {
+// Fixed 'any' type in props
+function MetricCard({ label, value, unit, icon: Icon, color }: { label: string; value: number; unit: string; icon: React.ElementType; color: string }) {
   return (
     <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800">
       <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 mb-2">
