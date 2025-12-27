@@ -13,6 +13,12 @@
 		"isolatedModules": true,
 		"jsx": "preserve",
 		"incremental": true,
+		
+		/* Production Safety & Best Practices */
+		"noUncheckedIndexedAccess": true,
+		"forceConsistentCasingInFileNames": true,
+		"verbatimModuleSyntax": true,
+
 		"plugins": [
 			{
 				"name": "next"
