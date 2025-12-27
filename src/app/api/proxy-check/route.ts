@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connect } from 'cloudflare:sockets';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { fetch } from 'next/dist/compiled/@edge-runtime/primitives'; // or global fetch
 
-export const runtime = 'edge';
+// Use Node.js compatibility mode for NPM libraries
+//export const runtime = 'nodejs';
 
-// Define the expected request body structure
 interface ProxyCheckBody {
   proxies: string[];
   timeout?: number;
@@ -11,62 +12,48 @@ interface ProxyCheckBody {
 
 export async function POST(req: NextRequest) {
   try {
-    // FIX: Cast the json() result to the interface to resolve the 'unknown' type error
     const body = await req.json() as ProxyCheckBody;
-    const { proxies, timeout = 3000 } = body;
-    
+    const { proxies, timeout = 5000 } = body;
+
     if (!proxies || !Array.isArray(proxies)) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
-    // Process batch
     const results = await Promise.all(
-      proxies.map(async (proxyStr: string) => {
-        const start = performance.now();
-        const [ip, portStr] = proxyStr.split(':');
-        const port = parseInt(portStr);
-
-        if (!ip || isNaN(port)) {
-          return { proxy: proxyStr, status: 'Invalid', latency: 0, healthy: false };
-        }
+      proxies.map(async (proxyStr) => {
+        const start = Date.now();
+        // Ensure protocol exists (default to http)
+        const formattedProxy = proxyStr.startsWith('http') ? proxyStr : `http://${proxyStr}`;
 
         try {
-          // Attempt TCP Connection
-          const socket = connect({ hostname: ip, port });
-          const writer = socket.writable.getWriter();
-          const reader = socket.readable.getReader();
+          // Create an agent for this specific proxy
+          const agent = new HttpsProxyAgent(formattedProxy);
+          
+          // Controller to handle timeout
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-          const connectionPromise = new Promise<void>(async (resolve, reject) => {
-            const timeoutId = setTimeout(() => reject(new Error('Timeout')), timeout);
-            
-            try {
-              // Lightweight Handshake
-              const handshake = new TextEncoder().encode("HEAD / HTTP/1.1\r\nHost: www.google.com\r\n\r\n");
-              await writer.write(handshake);
-              
-              clearTimeout(timeoutId);
-              resolve();
-            } catch (e) {
-              clearTimeout(timeoutId);
-              reject(e);
-            }
+          // Attempt to fetch a reliable, small endpoint (Google or similar)
+          const response = await fetch('https://www.google.com/generate_204', {
+            agent: agent as any, // Type cast for Next.js fetch compatibility
+            signal: controller.signal,
+            method: 'HEAD' // Lightweight request
           });
 
-          await connectionPromise;
-          
-          // Cleanup
-          try { await writer.close(); } catch {}
-          try { await reader.cancel(); } catch {}
+          clearTimeout(timeoutId);
 
-          const end = performance.now();
-          return { 
-            proxy: proxyStr, 
-            status: 'Active', 
-            latency: Math.round(end - start), 
-            healthy: true 
-          };
+          if (response.ok || response.status === 204) {
+             return { 
+              proxy: proxyStr, 
+              status: 'Active', 
+              latency: Date.now() - start, 
+              healthy: true 
+            };
+          } else {
+             throw new Error(`Status ${response.status}`);
+          }
 
-        } catch {
+        } catch (error) {
           return { 
             proxy: proxyStr, 
             status: 'Dead', 
@@ -79,7 +66,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ results });
 
-  } catch {
+  } catch (error) {
+    console.error('Proxy check error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
