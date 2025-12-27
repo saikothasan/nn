@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connect } from 'cloudflare:sockets';
 
-// export const runtime = 'edge';
+export const runtime = 'edge';
 
 // Define the expected request body structure
 interface ProxyCheckBody {
