@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { tools, ToolCategory } from '@/lib/tools-config';
-import { ArrowUpRight, Folder, Hash } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -45,7 +45,7 @@ export default function CategoriesPage() {
                      {catId}
                    </h2>
                    <span className="text-xs font-mono text-[var(--muted-foreground)] mb-1">
-                     // {categoryTools.length} MODULES DETECTED
+                     {'//'} {categoryTools.length} MODULES DETECTED
                    </span>
                 </div>
 
