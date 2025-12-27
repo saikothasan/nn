@@ -49,10 +49,13 @@ export default function TestAgent() {
         body: JSON.stringify({ url: targetUrl }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Test failed');
+      // FIX: Cast directly to 'any' or an intersection type to allow access to .error
+      const data = (await res.json()) as any;
       
-      // Type assertion here ensures we don't carry 'any' forward
+      if (!res.ok) {
+        throw new Error(data.error || 'Test failed');
+      }
+      
       setResult(data as TestResult);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -182,7 +185,6 @@ export default function TestAgent() {
   );
 }
 
-// Fixed 'any' type in props
 function MetricCard({ label, value, unit, icon: Icon, color }: { label: string; value: number; unit: string; icon: React.ElementType; color: string }) {
   return (
     <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800">
