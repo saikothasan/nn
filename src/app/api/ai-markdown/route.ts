@@ -2,9 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from '@cloudflare/puppeteer';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
-// REMOVE THIS LINE:
-// export const runtime = 'edge';
-
 interface MarkdownRequestBody {
   url: string;
 }
@@ -31,8 +28,11 @@ export async function POST(req: NextRequest) {
         const sessions = await puppeteer.sessions(env.MY_BROWSER);
         const freeSessions = sessions.filter((s) => !s.connectionId);
         
-        if (freeSessions.length > 0) {
-            sessionId = freeSessions[0].sessionId;
+        // FIX: Assign to a variable to satisfy TypeScript strict null checks
+        const firstSession = freeSessions[0];
+        
+        if (firstSession) {
+            sessionId = firstSession.sessionId;
             browser = await puppeteer.connect(env.MY_BROWSER, sessionId);
             console.log(`Reusing session: ${sessionId}`);
         }
