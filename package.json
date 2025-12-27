@@ -44,6 +44,7 @@
 	"devDependencies": {
 		"@eslint/eslintrc": "^3",
 		"@faker-js/faker": "latest",
+    "@playwright/test": "latest",
     "@cloudflare/playwright": "latest",
 		"@tailwindcss/forms": "latest",
 		"@tailwindcss/aspect-ratio": "latest",
