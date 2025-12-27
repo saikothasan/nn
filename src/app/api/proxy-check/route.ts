@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+// @ts-expect-error - Cloudflare Sockets types are not standard in Node environment
 import { connect } from 'cloudflare:sockets';
+
+
+// Define the expected request body structure
+interface ProxyCheckBody {
+  proxies: string[];
+  timeout?: number;
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const { proxies, timeout = 3000 } = await req.json();
+    // FIX: Cast the json() result to the interface to resolve the 'unknown' type error
+    const body = await req.json() as ProxyCheckBody;
+    const { proxies, timeout = 3000 } = body;
     
     if (!proxies || !Array.isArray(proxies)) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
