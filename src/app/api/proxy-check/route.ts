@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import * as net from 'node:net';
-import * as tls from 'node:tls';
 
 // FIX: Use 'nodejs' runtime to access node:net/tls via Cloudflare's nodejs_compat layer
 //export const runtime = 'nodejs';
@@ -38,7 +36,7 @@ export async function POST(req: NextRequest) {
 
           const response = await fetch('https://www.google.com/generate_204', {
             method: 'HEAD',
-            // @ts-ignore - Next.js fetch types don't officially support 'agent' but the runtime does
+            // @ts-expect-error - Next.js fetch types don't officially support 'agent' but the runtime does
             agent: agent, 
             signal: controller.signal
           });
@@ -56,7 +54,8 @@ export async function POST(req: NextRequest) {
              throw new Error(`Status: ${response.status}`);
           }
 
-        } catch (error) {
+        } catch {
+          // Catch block no longer declares 'error' since it was unused
           return { 
             proxy: proxyStr, 
             status: 'Dead', 
