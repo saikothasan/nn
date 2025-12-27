@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getTool, getToolsByCategory, tools } from '@/lib/tools-config';
 import type { Metadata } from 'next';
-import { ChevronRight, Home, ShieldCheck, Zap, Activity, Share2, Terminal } from 'lucide-react';
+import { ChevronRight, ShieldCheck, Zap, Activity, Share2, Terminal } from 'lucide-react';
 
 type Props = {
   params: Promise<{ slug: string }>
