@@ -48,3 +48,28 @@ body {
 	color: var(--foreground);
 	font-family: Arial, Helvetica, sans-serif;
 }
+
+/* src/app/globals.css */
+@layer components {
+  .prose-lg {
+    font-size: 1.125rem;
+    line-height: 1.8;
+  }
+  
+  /* Make headings cleaner */
+  .prose h2, .prose h3 {
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  
+  /* Blockquotes like OpenAI */
+  .prose blockquote {
+    border-left-width: 2px;
+    border-left-color: #3b82f6; /* blue-500 */
+    font-style: normal;
+    font-weight: 500;
+    color: var(--foreground);
+    background: transparent;
+    padding-left: 1.5rem;
+  }
+}
