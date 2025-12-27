@@ -10,6 +10,12 @@ interface ProxyResult {
   healthy: boolean;
 }
 
+// Define the API response structure
+interface ApiBatchResponse {
+  results: ProxyResult[];
+  error?: string;
+}
+
 export default function ProxyChecker() {
   const [input, setInput] = useState('');
   const [results, setResults] = useState<ProxyResult[]>([]);
@@ -52,7 +58,8 @@ export default function ProxyChecker() {
           signal: abortController.current.signal
         });
 
-        const data = await response.json();
+        // FIX: Cast response to the expected type
+        const data = (await response.json()) as ApiBatchResponse;
         
         if (data.results) {
           setResults(prev => [...prev, ...data.results]);
