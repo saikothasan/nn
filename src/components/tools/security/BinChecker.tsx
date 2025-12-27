@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Loader2, CheckCircle, AlertCircle, CreditCard, Globe, Info } from 'lucide-react';
+import { Loader2, AlertCircle, CreditCard, Globe, Info } from 'lucide-react';
 
 // Data Interfaces (kept same)
 interface BinData {
