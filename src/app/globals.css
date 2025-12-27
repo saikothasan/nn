@@ -5,12 +5,18 @@
 @plugin "@tailwindcss/aspect-ratio";
 
 :root {
-  /* Stark, Professional Foundation */
+  /* Base System Colors */
   --background: #ffffff;
   --foreground: #09090b; /* Zinc-950 */
+  
+  /* UI Element Colors */
   --muted: #f4f4f5;      /* Zinc-100 */
   --muted-foreground: #71717a; /* Zinc-500 */
   --border: #e4e4e7;     /* Zinc-200 */
+  --input: #e4e4e7;      /* Zinc-200 */
+  --ring: #18181b;       /* Zinc-900 (Focus Ring Color) */
+  
+  /* Accent Colors */
   --accent: #18181b;     /* Zinc-900 */
   --accent-foreground: #fafafa; /* Zinc-50 */
 }
@@ -19,18 +25,41 @@
   :root {
     --background: #09090b; /* Zinc-950 */
     --foreground: #fafafa; /* Zinc-50 */
+    
     --muted: #18181b;      /* Zinc-900 */
     --muted-foreground: #a1a1aa; /* Zinc-400 */
     --border: #27272a;     /* Zinc-800 */
+    --input: #27272a;      /* Zinc-800 */
+    --ring: #d4d4d8;       /* Zinc-300 */
+    
     --accent: #fafafa;     /* Zinc-50 */
     --accent-foreground: #09090b; /* Zinc-950 */
   }
 }
 
+/* Tailwind v4 Theme Configuration 
+   We map the CSS variables to Tailwind color names here.
+*/
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring); /* Fixes 'ring-ring' error */
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  /* Typography Defaults */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -44,27 +73,29 @@ body {
   mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
 }
 
-/* 2. The "Halftone" Texture (for Art Cards) */
+/* 2. The "Halftone" Texture */
 .bg-halftone {
   background-image: radial-gradient(var(--foreground) 1px, transparent 1px);
   background-size: 12px 12px;
   opacity: 0.1;
 }
 
-/* 3. Professional Typography Utilities */
+/* 3. Utilities */
 @utility text-balance {
   text-wrap: balance;
 }
 
 @layer components {
-  /* High-Contrast "System" Buttons */
+  /* High-Contrast "System" Buttons 
+     Now explicitly uses the defined --ring color via 'ring-ring' 
+  */
   .btn-agentic {
     @apply inline-flex items-center justify-center h-10 px-4 py-2 text-sm font-medium transition-colors border rounded-md focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
-    @apply border-[var(--border)] bg-transparent hover:bg-[var(--muted)] hover:text-[var(--foreground)];
+    @apply border-border bg-transparent hover:bg-muted hover:text-foreground;
   }
 
   .btn-agentic-primary {
-    @apply bg-[var(--accent)] text-[var(--accent-foreground)] hover:bg-[var(--accent)]/90 border-transparent shadow-sm;
+    @apply bg-accent text-accent-foreground hover:bg-accent/90 border-transparent shadow-sm;
   }
   
   .container-wide {
