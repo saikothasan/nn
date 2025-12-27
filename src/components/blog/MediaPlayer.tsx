@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize2, Minimize2 } from 'lucide-react';
-import { cn } from '@/lib/utils'; // Assuming you have a utils file, otherwise usage is inline
+import { cn } from '@/lib/utils'; 
 
 function formatTime(seconds: number) {
   const minutes = Math.floor(seconds / 60);
@@ -83,7 +83,6 @@ export function MediaPlayer({ src, type, poster }: MediaPlayerProps) {
 
   const toggleFullscreen = () => {
     if (!mediaRef.current) return;
-    // Simple fullscreen toggle logic for the container or video
     const container = mediaRef.current.parentElement;
     if (!document.fullscreenElement && container) {
         container.requestFullscreen().then(() => setIsFullscreen(true)).catch(console.error);
@@ -165,9 +164,4 @@ export function MediaPlayer({ src, type, poster }: MediaPlayerProps) {
       </div>
     </div>
   );
-}
-
-// Helper utility if you don't have one
-function cn(...classes: (string | undefined | null | false)[]) {
-    return classes.filter(Boolean).join(' ');
 }
