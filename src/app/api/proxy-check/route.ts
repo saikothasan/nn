@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-// @ts-ignore
+// @ts-expect-error - Cloudflare Sockets types are not standard in Node environment
 import { connect } from 'cloudflare:sockets';
-
 
 export async function POST(req: NextRequest) {
   try {
@@ -58,7 +57,7 @@ export async function POST(req: NextRequest) {
             healthy: true 
           };
 
-        } catch (error) {
+        } catch (_) { // Fix: Removed unused 'error' variable
           return { 
             proxy: proxyStr, 
             status: 'Dead', 
@@ -71,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ results });
 
-  } catch (error) {
+  } catch (_) { // Fix: Removed unused 'error' variable
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
