@@ -58,14 +58,14 @@
     "binding": "IMAGES"
   },
 
-  // 5. SECURITY & RATE LIMITING (FIXED)
+  // 5. SECURITY & RATE LIMITING
   "ratelimits": [
     {
-      "name": "RATE_LIMITER", // <--- CHANGED FROM "binding" TO "name"
+      "name": "RATE_LIMITER",
       "namespace_id": "1001",
       "simple": {
         "limit": 5,
-        "period": 3600
+        "period": 60 
       }
     }
   ],
