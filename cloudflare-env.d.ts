@@ -17,7 +17,7 @@ declare namespace Cloudflare {
 
 		// 3. AI & Browser Bindings
 		AI: any; // Using 'any' to prevent build errors if @cloudflare/workers-types isn't fully synced
-		MY_BROWSER: Fetcher; // Browser Rendering binding
+		BROWSER: Fetcher; // Browser Rendering binding
 
 		// 4. Media
 		IMAGES: Fetcher; // Cloudflare Images binding
