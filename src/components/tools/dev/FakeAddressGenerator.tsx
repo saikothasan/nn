@@ -1,46 +1,83 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   MapPin, RefreshCw, Copy, Check, Globe, 
-  User, Briefcase, CreditCard, Wifi, Smartphone, 
-  LayoutList, FileJson
+  User, CreditCard, Wifi, LayoutList, FileJson,
+  Search, Link as LinkIcon
 } from 'lucide-react';
-import { cn } from '@/lib/utils'; // Ensure you have a utility for class merging, or remove if not needed
 
-// Comprehensive list of locales supported by @faker-js/faker
-const LOCALES = [
-  { code: 'en', name: 'English' },
-  { code: 'en_US', name: 'English (USA)' },
-  { code: 'en_GB', name: 'English (UK)' },
+// Full list of Faker v8+ supported locales
+const ALL_LOCALES = [
+  { code: 'af_ZA', name: 'Afrikaans (South Africa)' },
+  { code: 'ar', name: 'Arabic' },
+  { code: 'az', name: 'Azerbaijani' },
+  { code: 'bn_BD', name: 'Bengali (Bangladesh)' },
+  { code: 'cs_CZ', name: 'Czech (Czechia)' },
+  { code: 'da', name: 'Danish' },
   { code: 'de', name: 'German' },
-  { code: 'fr', name: 'French' },
+  { code: 'de_AT', name: 'German (Austria)' },
+  { code: 'de_CH', name: 'German (Switzerland)' },
+  { code: 'el', name: 'Greek' },
+  { code: 'en', name: 'English' },
+  { code: 'en_AU', name: 'English (Australia)' },
+  { code: 'en_CA', name: 'English (Canada)' },
+  { code: 'en_GB', name: 'English (Great Britain)' },
+  { code: 'en_HK', name: 'English (Hong Kong)' },
+  { code: 'en_IE', name: 'English (Ireland)' },
+  { code: 'en_IN', name: 'English (India)' },
+  { code: 'en_NG', name: 'English (Nigeria)' },
+  { code: 'en_US', name: 'English (United States)' },
+  { code: 'en_ZA', name: 'English (South Africa)' },
   { code: 'es', name: 'Spanish' },
+  { code: 'es_MX', name: 'Spanish (Mexico)' },
+  { code: 'fa', name: 'Farsi/Persian' },
+  { code: 'fi', name: 'Finnish' },
+  { code: 'fr', name: 'French' },
+  { code: 'fr_BE', name: 'French (Belgium)' },
+  { code: 'fr_CA', name: 'French (Canada)' },
+  { code: 'fr_CH', name: 'French (Switzerland)' },
+  { code: 'he', name: 'Hebrew' },
+  { code: 'hr', name: 'Croatian' },
+  { code: 'hu', name: 'Hungarian' },
+  { code: 'hy', name: 'Armenian' },
+  { code: 'id_ID', name: 'Indonesian' },
   { code: 'it', name: 'Italian' },
   { code: 'ja', name: 'Japanese' },
+  { code: 'ka_GE', name: 'Georgian' },
   { code: 'ko', name: 'Korean' },
+  { code: 'lv', name: 'Latvian' },
+  { code: 'mk', name: 'Macedonian' },
+  { code: 'nb_NO', name: 'Norwegian' },
+  { code: 'ne', name: 'Nepalese' },
+  { code: 'nl', name: 'Dutch' },
+  { code: 'nl_BE', name: 'Dutch (Belgium)' },
+  { code: 'pl', name: 'Polish' },
+  { code: 'pt_BR', name: 'Portuguese (Brazil)' },
+  { code: 'pt_PT', name: 'Portuguese (Portugal)' },
+  { code: 'ro', name: 'Romanian' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'sk', name: 'Slovak' },
+  { code: 'sv', name: 'Swedish' },
+  { code: 'th', name: 'Thai' },
+  { code: 'tr', name: 'Turkish' },
+  { code: 'uk', name: 'Ukrainian' },
+  { code: 'ur', name: 'Urdu' },
+  { code: 'vi', name: 'Vietnamese' },
   { code: 'zh_CN', name: 'Chinese (China)' },
   { code: 'zh_TW', name: 'Chinese (Taiwan)' },
-  { code: 'ru', name: 'Russian' },
-  { code: 'pt_BR', name: 'Portuguese (Brazil)' },
-  { code: 'nl', name: 'Dutch' },
-  { code: 'pl', name: 'Polish' },
-  { code: 'tr', name: 'Turkish' },
-  { code: 'id_ID', name: 'Indonesian' },
-  { code: 'ar', name: 'Arabic' },
-  { code: 'hi', name: 'Hindi' },
-  { code: 'uk', name: 'Ukrainian' },
-  { code: 'sv', name: 'Swedish' },
-];
+  { code: 'zu_ZA', name: 'Zulu (South Africa)' },
+].sort((a, b) => a.name.localeCompare(b.name));
 
-// Re-using the interface from the API for type safety
+// Types
 interface FakeIdentity {
   identity: {
     firstName: string;
     lastName: string;
     fullName: string;
     gender: string;
-    birthday: string; // Transformed to string from JSON
+    birthday: string;
     avatar: string;
   };
   location: {
@@ -128,19 +165,34 @@ function FieldRow({ label, value }: { label: string, value: string | number }) {
   );
 }
 
-export default function FakeAddressGenerator() {
-  const [locale, setLocale] = useState('en_US');
+// Inner component that uses search params
+function GeneratorContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // Initialize from URL or default to US
+  const initialLocale = searchParams.get('locale') || 'en_US';
+  
+  const [locale, setLocale] = useState(initialLocale);
   const [data, setData] = useState<FakeIdentity | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'json'>('details');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const generateData = async () => {
+  // Update URL when locale changes
+  const handleLocaleChange = (newLocale: string) => {
+    setLocale(newLocale);
+    router.push(`?locale=${newLocale}`, { scroll: false });
+  };
+
+  // Fetch data
+  const generateData = async (targetLocale: string) => {
     setLoading(true);
     try {
       const res = await fetch('/api/fake-address', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ locale }),
+        body: JSON.stringify({ locale: targetLocale }),
       });
       const json = (await res.json()) as ApiResponse;
       if (json.success) {
@@ -153,58 +205,76 @@ export default function FakeAddressGenerator() {
     }
   };
 
-  // Generate initial data on mount
+  // Effect: Generate data when locale changes or on mount
   useEffect(() => {
-    generateData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    generateData(locale);
+  }, [locale]);
+
+  // Filtered locales for dropdown
+  const filteredLocales = ALL_LOCALES.filter(l => 
+    l.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    l.code.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const currentLocaleName = ALL_LOCALES.find(l => l.code === locale)?.name || locale;
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-12">
-      {/* Header */}
+      {/* Dynamic SEO Header */}
       <div className="text-center space-y-4 py-8">
         <div className="inline-flex items-center justify-center p-3 bg-teal-100 dark:bg-teal-900/30 rounded-2xl mb-4">
           <MapPin className="w-8 h-8 text-teal-600 dark:text-teal-400" />
         </div>
-        <h1 className="text-4xl font-bold text-zinc-900 dark:text-white">Fake Identity Generator</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white">
+          {currentLocaleName} Address Generator
+        </h1>
         <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-          Generate comprehensive fake identities including personal info, address, finance, and internet details for testing.
+          Generate realistic fake identity, address, and financial data for 
+          <strong className="text-teal-600 dark:text-teal-400"> {currentLocaleName} </strong> 
+          and 60+ other regions.
         </p>
       </div>
 
       {/* Controls */}
-      <div className="bg-white dark:bg-zinc-900 p-4 rounded-3xl shadow-lg border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-4 items-center sticky top-4 z-20 backdrop-blur-xl bg-opacity-80 dark:bg-opacity-80">
-        <div className="relative w-full sm:w-64">
-          <Globe className="absolute left-3 top-3.5 w-5 h-5 text-zinc-400" />
+      <div className="bg-white dark:bg-zinc-900 p-4 rounded-3xl shadow-lg border border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row gap-4 items-center sticky top-4 z-20 backdrop-blur-xl bg-opacity-80 dark:bg-opacity-80">
+        
+        {/* Searchable Locale Selector */}
+        <div className="relative w-full md:w-80 group">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Globe className="h-5 w-5 text-zinc-400" />
+          </div>
           <select 
             value={locale} 
-            onChange={(e) => setLocale(e.target.value)}
+            onChange={(e) => handleLocaleChange(e.target.value)}
             className="w-full pl-10 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl outline-none focus:ring-2 focus:ring-teal-500 transition-all text-zinc-900 dark:text-white appearance-none cursor-pointer"
           >
-            {LOCALES.map(l => (
+            {ALL_LOCALES.map(l => (
               <option key={l.code} value={l.code}>{l.name} ({l.code})</option>
             ))}
           </select>
+          {/* Optional: Add a custom search input overlay if you want true search, but native select is accessible */}
         </div>
 
         <button 
-          onClick={generateData}
+          onClick={() => generateData(locale)}
           disabled={loading}
-          className="w-full sm:flex-1 bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-70 shadow-md shadow-teal-600/20"
+          className="w-full md:flex-1 bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-70 shadow-md shadow-teal-600/20"
         >
           {loading ? <RefreshCw className="animate-spin w-5 h-5" /> : <>Generate New Identity <RefreshCw className="w-4 h-4" /></>}
         </button>
 
-        <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl">
+        <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shrink-0">
            <button 
              onClick={() => setActiveTab('details')}
              className={`p-2.5 rounded-lg transition-all ${activeTab === 'details' ? 'bg-white dark:bg-zinc-700 shadow text-teal-600' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'}`}
+             title="View Details"
            >
              <LayoutList className="w-5 h-5" />
            </button>
            <button 
              onClick={() => setActiveTab('json')}
              className={`p-2.5 rounded-lg transition-all ${activeTab === 'json' ? 'bg-white dark:bg-zinc-700 shadow text-teal-600' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'}`}
+             title="View JSON"
            >
              <FileJson className="w-5 h-5" />
            </button>
@@ -329,7 +399,7 @@ export default function FakeAddressGenerator() {
 
       {/* JSON Output Tab */}
       {data && activeTab === 'json' && (
-        <div className="bg-zinc-900 rounded-3xl p-6 border border-zinc-800 shadow-inner relative group">
+        <div className="bg-zinc-900 rounded-3xl p-6 border border-zinc-800 shadow-inner relative group animate-in fade-in">
            <button 
                 onClick={() => {navigator.clipboard.writeText(JSON.stringify(data, null, 2))}}
                 className="absolute top-4 right-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-2"
@@ -341,6 +411,37 @@ export default function FakeAddressGenerator() {
            </pre>
         </div>
       )}
+
+      {/* SEO Friendly Section: Browse All Countries */}
+      <div className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-800">
+        <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
+            <LinkIcon className="w-4 h-4" /> Browse Supported Countries
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {ALL_LOCALES.map(l => (
+                <button
+                    key={l.code}
+                    onClick={() => handleLocaleChange(l.code)}
+                    className={`text-left text-xs sm:text-sm px-3 py-2 rounded-lg transition-colors truncate
+                        ${l.code === locale 
+                            ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 font-medium' 
+                            : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                        }`}
+                >
+                    {l.name}
+                </button>
+            ))}
+        </div>
+      </div>
     </div>
+  );
+}
+
+// Main Component wrapped in Suspense for useSearchParams
+export default function FakeAddressGenerator() {
+  return (
+    <Suspense fallback={<div className="p-12 text-center text-zinc-500">Loading generator...</div>}>
+      <GeneratorContent />
+    </Suspense>
   );
 }
