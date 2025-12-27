@@ -64,8 +64,8 @@
       "name": "RATE_LIMITER", // <--- CHANGED FROM "binding" TO "name"
       "namespace_id": "1001",
       "simple": {
-        "limit": 50,
-        "period": 10
+        "limit": 5,
+        "period": 3600
       }
     }
   ],
