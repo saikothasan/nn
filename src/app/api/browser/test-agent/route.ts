@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
-import { launch } from '@cloudflare/playwright'; // Use Cloudflare's fork
-import fs from 'fs';
+import { launch } from '@cloudflare/playwright';
 
 // R2 Domain Configuration
 const R2_CUSTOM_DOMAIN = 'https://c.prokit.uk'; 
@@ -20,19 +19,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Browser or Storage binding not configured.' }, { status: 500 });
     }
 
-    // 1. Launch Browser (Cloudflare Browser Rendering)
+    // 1. Launch Browser
     browser = await launch(env.BROWSER);
-    
-    // 2. Setup Context & Tracing
     const context = await browser.newContext();
-    
-    // Start tracing (captures screenshots, snapshots, and sources)
-    await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
-
     const page = await context.newPage();
-    const consoleLogs: any[] = [];
     
-    // Capture Console Logs
+    // 2. Capture Console Logs
+    const consoleLogs: any[] = [];
     page.on('console', msg => {
       consoleLogs.push({
         type: msg.type(),
@@ -46,16 +39,12 @@ export async function POST(req: NextRequest) {
     await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
     const endTime = Date.now();
 
-    // 4. Collect Metrics (Core Web Vitals) via Injection
-    // We use a script to extract Performance API data
+    // 4. Collect Metrics via Page Evaluation
     const metrics = await page.evaluate(() => {
       const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
       const paint = performance.getEntriesByType('paint');
-      
       const fcp = paint.find(p => p.name === 'first-contentful-paint')?.startTime || 0;
       
-      // Rough LCP approximation (usually requires PerformanceObserver during load)
-      // This is a simplified snapshot of what's available now
       return {
         ttfb: nav ? nav.responseStart - nav.requestStart : 0,
         domLoad: nav ? nav.domContentLoadedEventEnd - nav.startTime : 0,
@@ -64,28 +53,16 @@ export async function POST(req: NextRequest) {
       };
     });
 
-    // 5. Take High-Res Screenshot
+    // 5. Screenshot (Buffer only, no FS write)
     const screenshotBuffer = await page.screenshot({ fullPage: false });
 
-    // 6. Stop Tracing & Save Trace
-    // Traces are saved to a local temp path in the worker
-    const tracePath = `/tmp/trace_${Date.now()}.zip`;
-    await context.tracing.stop({ path: tracePath });
-    const traceBuffer = fs.readFileSync(tracePath);
-
-    // 7. Upload Artifacts to R2
+    // 6. Upload to R2
     const testId = crypto.randomUUID();
     const screenshotKey = `playwright/${testId}/screenshot.png`;
-    const traceKey = `playwright/${testId}/trace.zip`;
 
-    await Promise.all([
-      env.MY_FILES.put(screenshotKey, screenshotBuffer, {
-        httpMetadata: { contentType: 'image/png' }
-      }),
-      env.MY_FILES.put(traceKey, traceBuffer, {
-        httpMetadata: { contentType: 'application/zip' }
-      })
-    ]);
+    await env.MY_FILES.put(screenshotKey, screenshotBuffer, {
+      httpMetadata: { contentType: 'image/png' }
+    });
 
     await browser.close();
 
@@ -94,7 +71,6 @@ export async function POST(req: NextRequest) {
       testId,
       urls: {
         screenshot: `${R2_CUSTOM_DOMAIN}/${screenshotKey}`,
-        trace: `${R2_CUSTOM_DOMAIN}/${traceKey}`,
       },
       data: {
         metrics: {
