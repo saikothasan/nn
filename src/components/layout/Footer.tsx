@@ -36,7 +36,7 @@ export function Footer() {
           {/* Tools Index */}
           <div className="p-8 md:p-12">
             <h4 className="font-mono text-xs font-semibold text-[var(--foreground)] uppercase tracking-wider mb-6">
-              // Core_Modules
+              {`// Core_Modules`}
             </h4>
             <ul className="space-y-3">
               <FooterLink href="/tool/bin-checker" code="SEC-01">BIN Inspector</FooterLink>
@@ -49,7 +49,7 @@ export function Footer() {
           {/* Resources Index */}
           <div className="p-8 md:p-12">
             <h4 className="font-mono text-xs font-semibold text-[var(--foreground)] uppercase tracking-wider mb-6">
-              // Documentation
+              {`// Documentation`}
             </h4>
             <ul className="space-y-3">
               <FooterLink href="/blog" code="DOC-01">Engineering Blog</FooterLink>
@@ -61,7 +61,7 @@ export function Footer() {
           {/* Legal / Compliance */}
           <div className="p-8 md:p-12">
             <h4 className="font-mono text-xs font-semibold text-[var(--foreground)] uppercase tracking-wider mb-6">
-              // Compliance
+              {`// Compliance`}
             </h4>
             <ul className="space-y-3">
               <FooterLink href="/privacy" code="LEG-01">Privacy Protocol</FooterLink>
