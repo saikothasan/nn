@@ -1,47 +1,100 @@
 import type { Metadata } from 'next';
-import { Shield, Zap, Globe } from 'lucide-react';
+import { Shield, Zap, Globe, Cpu } from 'lucide-react';
 import React from 'react'; 
 
 export const metadata: Metadata = {
-  title: 'About ProKit',
-  description: 'The story behind the privacy-focused developer toolkit.',
+  title: 'System Manifesto // ProKit',
+  description: 'Infrastructure design and privacy protocols.',
 };
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-black py-20 px-6">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-bold mb-8 dark:text-white">
-          Tools without the <span className="text-blue-600">tracking</span>.
-        </h1>
+    <div className="min-h-screen bg-[var(--background)]">
+      
+      {/* Hero Section */}
+      <div className="border-b border-[var(--border)] py-20 bg-grid-pattern relative">
+         <div className="max-w-4xl mx-auto px-6 relative z-10">
+            <div className="inline-flex items-center gap-2 mb-6 border border-[var(--border)] bg-[var(--background)] px-3 py-1 rounded-sm">
+              <span className="w-2 h-2 bg-blue-600 rounded-full" />
+              <span className="text-xs font-mono font-medium tracking-wide">MISSION STATEMENT</span>
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-[var(--foreground)] mb-8 leading-[0.9]">
+              Utilities without <br />
+              the <span className="text-[var(--muted-foreground)] line-through decoration-[var(--foreground)] decoration-2">surveillance</span>.
+            </h1>
+            
+            <p className="text-xl text-[var(--muted-foreground)] leading-relaxed max-w-2xl">
+              ProKit is a rejection of the bloated, ad-ridden web. 
+              We build single-purpose, high-performance infrastructure tools that respect privacy and execute on the Edge.
+            </p>
+         </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 py-20">
         
-        <div className="prose prose-lg dark:prose-invert mb-16">
-          <p>
-            Most online developer tools are bloated with ads, trackers, and slow scripts. 
-            We built <strong>ProKit</strong> to be different.
-          </p>
-          <p>
-            Our mission is simple: provide single-purpose, high-performance utilities that respect your privacy. 
-            We run on the Edge, meaning your data is processed instantly and securely, often without ever hitting a database.
-          </p>
+        {/* Core Protocols */}
+        <div className="space-y-16">
+          <Section 
+            number="01" 
+            title="Privacy Protocol" 
+            icon={<Shield />}
+            text="Zero tracking pixels. Zero analytics sharing. Zero logs. Your inputs are processed in ephemeral runtime environments and discarded immediately after execution." 
+          />
+          
+          <Section 
+            number="02" 
+            title="Edge Architecture" 
+            icon={<Zap />}
+            text="We leverage Cloudflare Workers to run code physically close to your location. This reduces latency to near-zero and eliminates the need for central origin servers." 
+          />
+          
+          <Section 
+            number="03" 
+            title="Open Source Core" 
+            icon={<Globe />}
+            text="Trust requires verification. Our core logic is open source and auditable on GitHub. We believe developer tools should be transparent infrastructure, not black boxes." 
+          />
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
-          <Feature icon={<Shield />} title="Privacy First" desc="No logs. No ads. Your data serves you, not us." />
-          <Feature icon={<Zap />} title="Edge Powered" desc="Running on Cloudflare Workers for near-zero latency." />
-          <Feature icon={<Globe />} title="Open Source" desc="Transparent code you can verify on GitHub." />
+        {/* Footer Note */}
+        <div className="mt-20 p-8 border border-[var(--border)] bg-[var(--muted)]/20 text-center">
+          <Cpu className="w-8 h-8 text-[var(--foreground)] mx-auto mb-4" />
+          <h3 className="font-bold text-[var(--foreground)] mb-2">Built by Developers, for Developers.</h3>
+          <p className="text-sm text-[var(--muted-foreground)] mb-6">
+            ProKit is maintained by DrKingBD as a contribution to the open web.
+          </p>
+          <a 
+             href="https://t.me/drkingbd" 
+             target="_blank"
+             className="btn-agentic"
+          >
+             Contact Maintenance
+          </a>
         </div>
+
       </div>
     </div>
   );
 }
 
-function Feature({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
+function Section({ number, title, icon, text }: { number: string, title: string, icon: React.ReactNode, text: string }) {
   return (
-    <div className="p-6 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
-      <div className="mb-4 text-blue-600 dark:text-blue-400">{icon}</div>
-      <h3 className="font-bold mb-2 dark:text-white">{title}</h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400">{desc}</p>
+    <div className="flex gap-6 md:gap-10 items-start">
+      <div className="hidden md:block font-mono text-sm text-[var(--muted-foreground)] pt-2">
+        {number} //
+      </div>
+      <div className="flex-1">
+         <div className="flex items-center gap-3 mb-4">
+           <div className="p-2 bg-[var(--muted)] text-[var(--foreground)] rounded-sm border border-[var(--border)]">
+             {React.cloneElement(icon as React.ReactElement, { size: 20 })}
+           </div>
+           <h2 className="text-2xl font-bold text-[var(--foreground)]">{title}</h2>
+         </div>
+         <p className="text-lg text-[var(--muted-foreground)] leading-relaxed border-l-2 border-[var(--border)] pl-6">
+           {text}
+         </p>
+      </div>
     </div>
   );
 }
