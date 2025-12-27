@@ -1,8 +1,8 @@
 import { getPostBySlug, getAllPosts } from '@/lib/blog';
 import ReactMarkdown from 'react-markdown';
 import { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
+import Image from 'next/image'; // Import Image
 import { ArrowLeft, Calendar, Tag, Clock } from 'lucide-react';
 import { AiSummary } from '@/components/blog/AiSummary';
 import { Comments } from '@/components/blog/Comments';
@@ -80,10 +80,11 @@ export default async function BlogPost({ params }: Props) {
       {/* Featured Image */}
       {post.image && (
         <div className="mb-10 relative h-[300px] md:h-[450px] w-full overflow-hidden rounded-2xl shadow-xl ring-1 ring-gray-900/5 dark:ring-white/10">
-           <Image 
+           <Image
             src={post.image} 
             alt={post.title} 
-            className="object-cover w-full h-full transition-transform duration-700 hover:scale-105" 
+            fill
+            className="object-cover transition-transform duration-700 hover:scale-105" 
            />
         </div>
       )}
