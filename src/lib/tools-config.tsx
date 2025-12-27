@@ -15,6 +15,7 @@ import {
   Languages
 } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
+import React from 'react';
 
 export type ToolCategory = 'security' | 'ai' | 'dns' | 'image' | 'dev';
 
@@ -23,8 +24,10 @@ export interface Tool {
   name: string;
   description: string;
   category: ToolCategory;
-  icon: any;
-  component: any;
+  // Fix: Use React.ElementType for icons (components passed as values)
+  icon: React.ElementType;
+  // Fix: Use React.ComponentType for the tool component itself
+  component: React.ComponentType;
   keywords: string[];
 }
 
