@@ -82,7 +82,7 @@ function Section({ number, title, icon, text }: { number: string, title: string,
   return (
     <div className="flex gap-6 md:gap-10 items-start">
       <div className="hidden md:block font-mono text-sm text-[var(--muted-foreground)] pt-2">
-        {number} //
+        {number} {'//'}
       </div>
       <div className="flex-1">
          <div className="flex items-center gap-3 mb-4">
