@@ -16,6 +16,7 @@
 		"@opennextjs/cloudflare": "^1.14.4",
 		"@cloudflare/ai-utils": "latest",
 		"@next/third-parties": "latest",
+		"@giscus/react": "latest",
 		"@cloudflare/ai-gateway": "latest",
 		"ssl-checker": "latest",
 		"gray-matter": "latest",
