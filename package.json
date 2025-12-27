@@ -31,6 +31,8 @@
 	"devDependencies": {
 		"@eslint/eslintrc": "^3",
 		"@faker-js/faker": "latest",
+		"@tailwindcss/forms": "latest",
+		"@tailwindcss/aspect-ratio": "latest",
 		"@tailwindcss/typography": "latest",
 		"@types/crypto-js": "latest",
 		"@tailwindcss/postcss": "^4",
