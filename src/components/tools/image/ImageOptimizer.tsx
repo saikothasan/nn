@@ -249,13 +249,13 @@ export default function ImageOptimizer() {
                         <div className="space-y-2">
                              <p className="text-center text-sm font-medium text-gray-500">Original</p>
                              <div className="relative aspect-video bg-gray-200 dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-                                <img src={preview} alt="Original" className="object-contain w-full h-full" />
+                                <Image src={preview} alt="Original" className="object-contain w-full h-full" />
                              </div>
                         </div>
                         <div className="space-y-2">
                              <p className="text-center text-sm font-medium text-green-600">Optimized ({result.format.toUpperCase()})</p>
                              <div className="relative aspect-video bg-gray-200 dark:bg-gray-800 rounded-xl overflow-hidden border-2 border-green-500/30">
-                                <img src={result.image} alt="Optimized" className="object-contain w-full h-full" />
+                                <Image src={result.image} alt="Optimized" className="object-contain w-full h-full" />
                              </div>
                         </div>
                     </div>
