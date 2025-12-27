@@ -43,6 +43,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@faker-js/faker": "latest",
+    "@cloudflare/workers-types": "latest",
     "@tailwindcss/forms": "latest",
     "@tailwindcss/aspect-ratio": "latest",
     "@tailwindcss/typography": "latest",
