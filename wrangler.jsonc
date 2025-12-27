@@ -24,20 +24,20 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "bin-db",
-      "database_id": "be1a4fee-8588-44af-b67e-16e61ce4ff0c"
+      "database_name": "prokit",
+      "database_id": "5b825b52-41f9-4935-b306-d29ec71501ce"
     }
   ],
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "ebdb43ac0bdd46f1bd3015de295ababf"
+      "id": "4ddc40c9bdde43efa2806bf6db5b6991"
     }
   ],
   "r2_buckets": [
     {
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      "bucket_name": "omni-agent-artifacts"
+      "bucket_name": "templates"
     },
     {
       "binding": "MY_FILES",
