@@ -1,7 +1,7 @@
 ---
 title: "Welcome to ProKit"
 date: "2024-03-20"
-image: "/images/posts/01.jpg"
+image: "/images/freepik__hacker__49541.jpeg"
 description: "Discover how ProKit can streamline your development workflow with powerful AI and security tools."
 categories: ["Announcements"]
 tags: ["intro", "guide", "prokit"]
